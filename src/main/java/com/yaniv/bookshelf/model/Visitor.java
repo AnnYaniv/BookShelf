@@ -4,17 +4,18 @@ import com.yaniv.bookshelf.model.enums.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Visitor {
     @Id
@@ -28,6 +29,7 @@ public class Visitor {
     private String userName;
 
     @OneToMany(mappedBy = "id" ,fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<Invoice> invoices;
 
     @NotBlank

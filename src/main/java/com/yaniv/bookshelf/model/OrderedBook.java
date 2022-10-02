@@ -18,7 +18,7 @@ public class OrderedBook {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
-    @ManyToOne
+    @OneToOne
     private Book book;
 
     @Min(1)

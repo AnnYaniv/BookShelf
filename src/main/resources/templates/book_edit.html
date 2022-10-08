@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book edit</title>
+    <!--favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <!--favicon-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<header th:replace="fragment/header :: header"></header>
+<div class="container py-5">
+    <form class="not-validated" th:action="@{/book/edit}" th:object="${bookdto}" method="post"
+          enctype="multipart/form-data">
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <label for="isbn">ISBN</label>
+                <input type="text" class="form-control" id="isbn" placeholder="ISBN" th:value="${bookdto.isbn}"
+                       th:field="*{isbn}" required>
+                <div class="invalid-feedback">Add ISBN</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="name">Title</label>
+                <input type="text" class="form-control" id="name"
+                       placeholder="Title" th:value="${bookdto.name}" th:field="*{name}" required>
+                <div class="invalid-feedback">Add title</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="p_house">Publishing house</label>
+                <input type="text" class="form-control" id="p_house" th:field="*{publishingHouse}"
+                       placeholder="published by" th:value="${bookdto.publishingHouse}" required>
+                <div class="invalid-feedback"></div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <label for="count">Count</label>
+                <input type="text" class="form-control" id="count"
+                       placeholder="Quantity of books" th:value="${bookdto.count}" th:field="*{count}" required>
+                <div class="invalid-feedback">Quantity of books</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="price">Price</label>
+                <input type="text" class="form-control" id="price"
+                       placeholder="Price" th:value="${bookdto.price}" th:field="*{price}" required>
+                <div class="invalid-feedback">Price of book</div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="year">Year of publishing</label>
+                <input type="text" class="form-control" id="year"
+                       placeholder="Year" th:value="${bookdto.year}" th:field="*{year}" required>
+                <div class="invalid-feedback">Year</div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-4 mb-6">
+                <div class="form-group">
+                    <label for="annotation">Annotation</label>
+                    <textarea class="form-control" id="annotation" rows="6" th:text="${bookdto.annotation}"
+                              th:field="*{annotation}"></textarea>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-group">
+                    <label for="authorsIds">Select authors</label>
+                    <select class="form-control" id="authorsIds" th:field="*{authorsIds}" multiple="multiple">
+                        <option th:each="author : ${authors}"
+                                th:value="${author.id}"
+                                th:text="${author.firstName + ' ' + author.lastName}">
+                            Author
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-group">
+                    <label for="genres">Select genres</label>
+                    <select multiple class="form-control" th:field="*{genre}" id="genres">
+                        <option th:each="genre : ${genres}"
+                                th:value="${genre}"
+                                th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(genre,'_',' ')))}"></option>
+
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="custom_cover" th:field="*{cover}">
+                    <label class="custom-file-label" for="custom_cover">Choose a cover</label>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="bookUrl" th:field="*{bookUrl}">
+                    <label class="custom-file-label" for="custom_cover">Choose a book</label>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-lg btn-outline-primary text-uppercase" type="submit" formmethod="post" value="Upload">
+            Update
+        </button>
+    </form>
+</div>
+
+<script>
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>

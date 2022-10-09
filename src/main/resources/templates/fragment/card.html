@@ -63,11 +63,11 @@
 
                     <div class="d-flex flex-row">
                         <a th:href="@{/book(isbn=${book.isbn})}">
-                            <button type="button" class="btn btn-primary flex-fill me-1" data-mdb-ripple-color="dark">
+                            <button type="button" class="btn btn-info flex-fill me-1" data-mdb-ripple-color="dark">
                                 Learn more
                             </button>
                         </a>
-                        <button type="button" class="btn btn-danger flex-fill ms-1">Add to cart</button>
+                        <button type="button" class="btn btn-dark flex-fill ms-1">To cart</button>
                     </div>
                 </div>
             </div>
@@ -125,7 +125,7 @@
                                 <dd>
                                     <label class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio2" value="option2">
+                                               id="inlineRadio1" value="option2">
                                         <span class="form-check-label">Paper version</span>
                                     </label>
                                     <label class="form-check form-check-inline">
@@ -138,10 +138,9 @@
                         </div> <!-- col.// -->
                     </div> <!-- row.// -->
                     <hr>
-                    <a href="#" class="btn btn-lg btn-primary text-uppercase"> Add to favourite </a>
-                    <a href="#" class="btn btn-lg btn-outline-primary text-uppercase"> <i
-                            class="fas fa-shopping-cart"></i> Add to cart </a>
-                    <a th:href="@{/book/edit(isbn=${book.isbn})}" class="btn btn-lg btn-primary text-uppercase"> update </a>
+                    <a href="#" class="btn btn-lg btn-dark text-uppercase">to favourite</a>
+                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase">to cart</a>
+                    <a th:href="@{/book/edit(isbn=${book.isbn})}" class="btn btn-lg btn-warning text-uppercase">update</a>
                 </article> <!-- card-body.// -->
             </aside> <!-- col.// -->
         </div> <!-- row.// -->

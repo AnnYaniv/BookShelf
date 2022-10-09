@@ -75,6 +75,7 @@
                     <select class="form-control" id="authorsIds" th:field="*{authorsIds}" multiple="multiple">
                         <option th:each="author : ${authors}"
                                 th:value="${author.id}"
+                                th:selected="${bookdto.authorsIds.contains(author.id)}"
                                 th:text="${author.firstName + ' ' + author.lastName}">
                             Author
                         </option>
@@ -109,7 +110,7 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-lg btn-outline-primary text-uppercase" type="submit" formmethod="post" value="Upload">
+        <button class="btn btn-lg btn-info text-uppercase" type="submit" formmethod="post" value="Upload">
             Update
         </button>
     </form>

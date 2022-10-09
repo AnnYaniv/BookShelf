@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authors</title>
+    <!--favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <!--favicon-->
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header th:replace="fragment/header :: header"></header>
+
+    <div class="container py-5">
+        <form class="not-validated" th:action="@{/author}" th:object="${author}" method="post"
+              enctype="multipart/form-data">
+            <div class="form-group row">
+                <div class="col">
+                    <label for="authorId">Id</label>
+                    <input type="text" class="form-control" id="authorId" placeholder="Id" th:value="${author.id}"
+                           th:field="*{id}" required>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div class="col">
+                    <label for="name">First name</label>
+                    <input type="text" class="form-control" id="name"
+                           placeholder="first name" th:value="${author.firstName}" th:field="*{firstName}" required>
+                    <div class="invalid-feedback">Add name</div>
+                </div>
+                <div class="col">
+                    <label for="l_name">Last name</label>
+                    <input type="text" class="form-control" id="l_name" th:field="*{lastName}"
+                           placeholder="last name" th:value="${author.lastName}">
+                </div>
+                <div class="col">
+                    <br />
+                    <button class="btn btn-dark" type="submit" formmethod="post" value="Upload" id="button">
+                        Update
+                    </button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+        </tr>
+        </thead>
+        <tbody th:each="author : ${authors}">
+        <tr>
+            <th scope="row"><button type="button" class="btn btn-link" th:text="${author.id}"
+                                    th:attr="onclick=|setId('${author.id}','${author.firstName}','${author.lastName}')|" >Id</button></th>
+            <td th:text="${author.firstName}">first name</td>
+            <td th:text="${author.lastName}">last name</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function setId(id, name, lastName) {
+            document.getElementById("authorId").value = id;
+            document.getElementById("name").value = name;
+            document.getElementById("l_name").value = lastName;
+        }
+    </script>
+</body>
+</html>

@@ -62,7 +62,7 @@ public class BookController {
     @GetMapping("/create")
     public ModelAndView createBook(){
         ModelAndView modelAndView = new ModelAndView("book_edit");
-        modelAndView.addObject("book", new Book());
+        modelAndView.addObject("bookdto", BookMapper.toDto(new Book()));
         modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
         modelAndView.addObject("authors", authorService.getAll());
         return modelAndView;

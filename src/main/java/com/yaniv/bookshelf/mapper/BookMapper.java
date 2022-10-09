@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,21 +28,25 @@ public class BookMapper {
         book.setYear(dto.getYear());
 
         MultipartFile cover = dto.getCover();
-        String contentType = switch (Objects.requireNonNull(cover.getContentType())) {
-            case "image/png" -> ".png";
-            case "image/jpeg" -> ".jpeg";
-            case "image/jpg" -> ".jpg";
-            default -> ".data";
-        };
-        String name = UUID.randomUUID() + contentType;
+        if(!cover.isEmpty()) {
+            String contentType = switch (Objects.requireNonNull(cover.getContentType())) {
+                case "image/png" -> ".png";
+                case "image/jpeg" -> ".jpeg";
+                case "image/jpg" -> ".jpg";
+                default -> ".data";
+            };
+            String name = UUID.randomUUID() + contentType;
 
-        Files.copy(dto.getCover().getInputStream(),
-                Paths.get("src", "main", "resources", "static", "covers").resolve(
-                        name));
+            Files.copy(dto.getCover().getInputStream(),
+                    Paths.get("src", "main", "resources", "static", "covers").resolve(
+                            name));
 //        TODO: this code to final version
 //            Path.of(loader.getResource("static/covers").toURI())
 //                    .resolve(name  + contentType));
-        book.setCover(name);
+            book.setCover(name);
+        } else {
+            book.setCover(null);
+        }
         book.setAuthor(dto.getAuthorsIds().stream().map(authorId -> {
             Author author = new Author();
             author.setId(authorId);
@@ -52,11 +57,16 @@ public class BookMapper {
         return book;
     }
 
+
     public static BookDto toDto(Book book) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        //String coverPath = classLoader.getResource("/static/covers/" + book.getCover()).getPath();
+
         return new BookDto(
                 book.getIsbn(), book.getName(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
-                null, null, null, null
+                null, null, book.getAuthor().stream().map(Author::getId).toList(),
+                book.getGenre()
         );
     }
 }

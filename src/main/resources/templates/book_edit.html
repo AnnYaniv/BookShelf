@@ -110,10 +110,22 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-lg btn-info text-uppercase" type="submit" formmethod="post" value="Upload">
-            Update
-        </button>
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <button class="btn btn-lg btn-info text-uppercase" type="submit" formmethod="post" value="Upload">
+                    Update
+                </button>
+            </div>
+            <div class="col-md-4 mb-3">
+                <input type="text" class="form-control invisible" th:value="*{coverUrl}" th:field="*{coverUrl}"
+                       id="coverUrl"/>
+                <input type="text" class="form-control invisible" th:value="*{visited}" th:field="*{visited}"
+                       id="visited"/>
+            </div>
+        </div>
     </form>
+
+    <div th:replace="author_edit :: author_form(${author})"></div>
 </div>
 
 <script>

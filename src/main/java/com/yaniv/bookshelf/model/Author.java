@@ -5,12 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,7 +24,12 @@ public class Author {
     private String lastName;
 
     @ManyToMany
-    private Set<Book> books = new HashSet<>();
+    @JoinTable(
+            name = "book_author",
+            joinColumns = { @JoinColumn(name = "author_id", referencedColumnName="id")},
+            inverseJoinColumns = { @JoinColumn(name = "book_isbn", referencedColumnName="isbn")}
+    )
+    private Set<Book> books = new java.util.LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {

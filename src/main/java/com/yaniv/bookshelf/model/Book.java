@@ -24,7 +24,12 @@ public class Book {
     private String name;
 
     @ManyToMany
-    private Set<Author> author = new HashSet<>();
+    @JoinTable(
+            name = "book_author",
+            joinColumns = { @JoinColumn(name = "book_isbn", referencedColumnName="isbn") },
+            inverseJoinColumns = { @JoinColumn(name = "author_id", referencedColumnName="id")}
+    )
+    private Set<Author> author = new java.util.LinkedHashSet<>();
 
     @Type(type="text")
     private String annotation;

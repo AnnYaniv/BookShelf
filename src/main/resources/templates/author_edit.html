@@ -19,7 +19,8 @@
 <body>
     <header th:replace="fragment/header :: header"></header>
 
-    <div class="container py-5">
+    <div class="container py-5" th:fragment="author_form(author)">
+        <label>Add author</label>
         <form class="not-validated" th:action="@{/author}" th:object="${author}" method="post"
               enctype="multipart/form-data">
             <div class="form-group row">

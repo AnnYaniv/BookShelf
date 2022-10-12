@@ -37,15 +37,16 @@ public class BookMapper {
             };
             String name = UUID.randomUUID() + contentType;
 
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
             Files.copy(dto.getCover().getInputStream(),
                     Paths.get("src", "main", "resources", "static", "covers").resolve(
                             name));
-//        TODO: this code to final version
-//            Path.of(loader.getResource("static/covers").toURI())
-//                    .resolve(name  + contentType));
+            Files.copy(dto.getCover().getInputStream(),
+                Path.of(Objects.requireNonNull(loader.getResource("static/covers")).toURI())
+                    .resolve(name));
             book.setCover(name);
         } else {
-            book.setCover(null);
+            book.setCover(dto.getCoverUrl());
         }
         book.setAuthor(dto.getAuthorsIds().stream().map(authorId -> {
             Author author = new Author();
@@ -53,19 +54,16 @@ public class BookMapper {
             return author;
         }).collect(Collectors.toSet()));
         book.setGenre(dto.getGenre());
-
+        book.setVisited(dto.getVisited());
         return book;
     }
 
 
     public static BookDto toDto(Book book) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        //String coverPath = classLoader.getResource("/static/covers/" + book.getCover()).getPath();
-
         return new BookDto(
                 book.getIsbn(), book.getName(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
-                null, null, book.getAuthor().stream().map(Author::getId).toList(),
+                null, book.getCover() ,null, book.getAuthor().stream().map(Author::getId).toList(),
                 book.getGenre()
         );
     }

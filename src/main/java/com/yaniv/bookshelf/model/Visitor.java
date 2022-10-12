@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -36,9 +35,4 @@ public class Visitor {
     private String email;
 
     private String password;
-
-    @PrePersist
-    public void prePersist() {
-        password = new SCryptPasswordEncoder().encode(password);
-    }
 }

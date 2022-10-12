@@ -25,6 +25,7 @@ public class BookDto {
     double price;
     Integer visited;
     MultipartFile cover;
+    String coverUrl;
     MultipartFile bookUrl;
     List<String> authorsIds ;
     Set<Genre> genre;
@@ -40,8 +41,11 @@ public class BookDto {
                 ", count=" + count +
                 ", price=" + price +
                 ", visited=" + visited +
-                ", authorId="+ authorsIds +
-//                ", cover=" + cover +
+                //", cover=" + cover +
+                ", coverUrl='" + coverUrl + '\'' +
+                //", bookUrl=" + bookUrl +
+                ", authorsIds=" + authorsIds +
+                ", genre=" + genre +
                 '}';
     }
 }

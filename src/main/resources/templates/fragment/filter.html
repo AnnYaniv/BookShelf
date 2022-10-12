@@ -1,278 +1,271 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <!------ Include the above in your HEAD tag ---------->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
 
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 </head>
 <body>
 
 
 <div class="container">
-  <br>  <p class="text-center">More bootstrap 4 components on <a href="http://bootstrap-ecommerce.com/"> Bootstrap-ecommerce.com</a></p>
-  <hr>
+    <br>
+    <p class="text-center">More bootstrap 4 components on <a href="http://bootstrap-ecommerce.com/">
+        Bootstrap-ecommerce.com</a></p>
+    <hr>
 
-  <div class="row">
-    <aside class="col-sm-4">
-      <p>Filter 1</p>
+    <div class="row">
+        <aside class="col-sm-4">
+            <p>Filter 1</p>
 
 
-      <div class="card">
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Brands </h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <form>
-                <label class="form-check">
-                  <input class="form-check-input" type="checkbox" value="">
-                  <span class="form-check-label">
+            <div class="card">
+                <article class="card-group-item">
+                    <header class="card-header">
+                        <h6 class="title">Brands </h6>
+                    </header>
+                    <div class="filter-content">
+                        <div class="card-body">
+                            <form>
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="">
+                                    <span class="form-check-label">
 				    Mersedes Benz
 				  </span>
-                </label> <!-- form-check.// -->
-                <label class="form-check">
-                  <input class="form-check-input" type="checkbox" value="">
-                  <span class="form-check-label">
+                                </label> <!-- form-check.// -->
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="">
+                                    <span class="form-check-label">
 				    Nissan Altima
 				  </span>
-                </label>  <!-- form-check.// -->
-                <label class="form-check">
-                  <input class="form-check-input" type="checkbox" value="">
-                  <span class="form-check-label">
+                                </label>  <!-- form-check.// -->
+                                <label class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="">
+                                    <span class="form-check-label">
 				    Another Brand
 				  </span>
-                </label>  <!-- form-check.// -->
-              </form>
+                                </label>  <!-- form-check.// -->
+                            </form>
 
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
+                        </div> <!-- card-body.// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
 
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Choose type </h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
+                <article class="card-group-item">
+                    <header class="card-header">
+                        <h6 class="title">Choose type </h6>
+                    </header>
+                    <div class="filter-content">
+                        <div class="card-body">
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadio" value="">
+                                <span class="form-check-label">
 			    First hand items
 			  </span>
-              </label>
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
+                            </label>
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadio" value="">
+                                <span class="form-check-label">
 			    Brand new items
 			  </span>
-              </label>
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
+                            </label>
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadio" value="">
+                                <span class="form-check-label">
 			    Some other option
 			  </span>
-              </label>
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-      </div> <!-- card.// -->
+                            </label>
+
+                        </div> <!-- card-body.// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
+            </div> <!-- card.// -->
 
 
+        </aside> <!-- col.// -->
+        <aside class="col-sm-4">
+            <p>Filter 2</p>
+            <div class="card">
+                <article class="card-group-item">
+                    <header class="card-header"><h6 class="title">Similar category </h6></header>
+                    <div class="filter-content">
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item">Cras justo odio <span
+                                    class="float-right badge badge-light round">142</span> </a>
+                            <a href="#" class="list-group-item">Dapibus ac facilisis <span
+                                    class="float-right badge badge-light round">3</span> </a>
+                            <a href="#" class="list-group-item">Morbi leo risus <span
+                                    class="float-right badge badge-light round">32</span> </a>
+                            <a href="#" class="list-group-item">Another item <span
+                                    class="float-right badge badge-light round">12</span> </a>
+                        </div>  <!-- list-group .// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
+                <article class="card-group-item">
+                    <header class="card-header"><h6 class="title">Color check</h6></header>
+                    <div class="filter-content">
+                        <div class="card-body">
+                            <label class="btn btn-danger">
+                                <input class="" type="checkbox" name="myradio" value="">
+                                <span class="form-check-label">Red</span>
+                            </label>
+                            <label class="btn btn-success">
+                                <input class="" type="checkbox" name="myradio" value="">
+                                <span class="form-check-label">Green</span>
+                            </label>
+                            <label class="btn btn-primary">
+                                <input class="" type="checkbox" name="myradio" value="">
+                                <span class="form-check-label">Blue</span>
+                            </label>
+                        </div> <!-- card-body.// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
+            </div> <!-- card.// -->
 
 
-    </aside> <!-- col.// -->
-    <aside class="col-sm-4">
-      <p>Filter 2</p>
+        </aside> <!-- col.// -->
+        <aside class="col-sm-4">
+            <p>Filter 3</p>
+            <div class="card">
+                <article class="card-group-item">
+                    <header class="card-header">
+                        <h6 class="title">Range input </h6>
+                    </header>
+                    <div class="filter-content">
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Min</label>
+                                    <input type="number" class="form-control" id="inputEmail4" placeholder="$0">
+                                </div>
+                                <div class="form-group col-md-6 text-right">
+                                    <label>Max</label>
+                                    <input type="number" class="form-control" placeholder="$1,0000">
+                                </div>
+                            </div>
+                        </div> <!-- card-body.// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
+                <article class="card-group-item">
+                    <header class="card-header">
+                        <h6 class="title">Selection </h6>
+                    </header>
+                    <div class="filter-content">
+                        <div class="card-body">
+                            <div class="custom-control custom-checkbox">
+                                <span class="float-right badge badge-light round">52</span>
+                                <input type="checkbox" class="custom-control-input" id="Check1">
+                                <label class="custom-control-label" for="Check1">Samsung</label>
+                            </div> <!-- form-check.// -->
+
+                            <div class="custom-control custom-checkbox">
+                                <span class="float-right badge badge-light round">132</span>
+                                <input type="checkbox" class="custom-control-input" id="Check2">
+                                <label class="custom-control-label" for="Check2">Black berry</label>
+                            </div> <!-- form-check.// -->
+
+                            <div class="custom-control custom-checkbox">
+                                <span class="float-right badge badge-light round">17</span>
+                                <input type="checkbox" class="custom-control-input" id="Check3">
+                                <label class="custom-control-label" for="Check3">Samsung</label>
+                            </div> <!-- form-check.// -->
+
+                            <div class="custom-control custom-checkbox">
+                                <span class="float-right badge badge-light round">7</span>
+                                <input type="checkbox" class="custom-control-input" id="Check4">
+                                <label class="custom-control-label" for="Check4">Other Brand</label>
+                            </div> <!-- form-check.// -->
+                        </div> <!-- card-body.// -->
+                    </div>
+                </article> <!-- card-group-item.// -->
+            </div> <!-- card.// -->
+        </aside> <!-- col.// -->
+
+        <div th:fragment="side_filter">
+<!--            <form class="not-validated" th:action="@{/book/filterBy}" th:object="${filterDto}" method="post">-->
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+                <div class="card">
+                    <article class="card-group-item">
+                        <header class="card-header">
+                            <h6 class="title">Price</h6>
+                        </header>
+                        <div class="filter-content">
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label>Min</label>
+                                        <input type="number" class="form-control" id="min_input" placeholder="0"
+                                               value="0" />
+                                    </div>
+                                    <div class="form-group col-md-6 text-right">
+                                        <label>Max</label>
+                                        <input type="number" class="form-control" id="max_input" placeholder="1,0000"
+                                               />
+                                    </div>
+                                </div>
+                            </div> <!-- card-body.// -->
+                        </div>
+                    </article> <!-- card-group-item.// -->
+                    <article class="card-group-item">
+                        <header class="card-header">
+                            <h6 class="title">Genre </h6>
+                        </header>
+                        <div class="filter-content">
+                            <div class="card-body" id="genres-card">
+                                <div class="row">
+                                    <div class="custom-control custom-checkbox col-6 col-sm-4" th:each="genre : ${T(com.yaniv.bookshelf.model.enums.Genre).values()}">
+                                        <input
+                                               type="checkbox"
+                                               class="custom-control-input"
+                                               name="genre"
+                                               th:id="${genre}"
+                                               th:value="${genre}"
+                                        >
+                                        <label class="custom-control-label" th:for="${genre}"
+                                               th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(genre,'_',' ')))}"></label>
+                                        </input>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
 
 
-      <div class="card">
-        <article class="card-group-item">
-          <header class="card-header"><h6 class="title">Similar category </h6></header>
-          <div class="filter-content">
-            <div class="list-group list-group-flush">
-              <a href="#" class="list-group-item">Cras justo odio <span class="float-right badge badge-light round">142</span> </a>
-              <a href="#" class="list-group-item">Dapibus ac facilisis  <span class="float-right badge badge-light round">3</span>  </a>
-              <a href="#" class="list-group-item">Morbi leo risus <span class="float-right badge badge-light round">32</span>  </a>
-              <a href="#" class="list-group-item">Another item <span class="float-right badge badge-light round">12</span>  </a>
-            </div>  <!-- list-group .// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-        <article class="card-group-item">
-          <header class="card-header"><h6 class="title">Color check</h6></header>
-          <div class="filter-content">
-            <div class="card-body">
-              <label class="btn btn-danger">
-                <input class="" type="checkbox" name="myradio" value="">
-                <span class="form-check-label">Red</span>
-              </label>
-              <label class="btn btn-success">
-                <input class="" type="checkbox" name="myradio" value="">
-                <span class="form-check-label">Green</span>
-              </label>
-              <label class="btn btn-primary">
-                <input class="" type="checkbox" name="myradio" value="">
-                <span class="form-check-label">Blue</span>
-              </label>
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-      </div> <!-- card.// -->
-
-
-
-    </aside> <!-- col.// -->
-    <aside class="col-sm-4">
-      <p>Filter  3</p>
-
-
-
-      <div class="card">
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Range input </h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Min</label>
-                  <input type="number" class="form-control" id="inputEmail4" placeholder="$0">
+                    <article class="card-group-item">
+                        <header class="card-header">
+                            <h6 class="title">Sort by </h6>
+                        </header>
+                        <div class="filter-content">
+                            <div class="card-body" >
+                                <label class="form-check">
+                                    <input class="form-check-input" type="radio" name="sort" value="PRICE"/>
+                                    <span class="form-check-label">By price</span>
+                                </label>
+                                <label class="form-check">
+                                    <input class="form-check-input" type="radio" name="sort" value="MARK"/>
+                                    <span class="form-check-label"> Highest mark </span>
+                                </label>
+                                <label class="form-check">
+                                    <input class="form-check-input" type="radio" name="sort"
+                                           value="POPULARITY"/>
+                                    <span class="form-check-label">By popularity</span>
+                                </label>
+                            </div>
+                        </div>
+                    </article>
+<!--                    <button class="btn btn-info" id="search-filter" formmethod="post" type="submit">Search</button>-->
+                    <button class="btn btn-info" id="ajax-tester-btn" type="button">Show result</button>
                 </div>
-                <div class="form-group col-md-6 text-right">
-                  <label>Max</label>
-                  <input type="number" class="form-control" placeholder="$1,0000">
-                </div>
-              </div>
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Selection </h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">52</span>
-                <input type="checkbox" class="custom-control-input" id="Check1">
-                <label class="custom-control-label" for="Check1">Samsung</label>
-              </div> <!-- form-check.// -->
-
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">132</span>
-                <input type="checkbox" class="custom-control-input" id="Check2">
-                <label class="custom-control-label" for="Check2">Black berry</label>
-              </div> <!-- form-check.// -->
-
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">17</span>
-                <input type="checkbox" class="custom-control-input" id="Check3">
-                <label class="custom-control-label" for="Check3">Samsung</label>
-              </div> <!-- form-check.// -->
-
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">7</span>
-                <input type="checkbox" class="custom-control-input" id="Check4">
-                <label class="custom-control-label" for="Check4">Other Brand</label>
-              </div> <!-- form-check.// -->
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-
-
-      </div> <!-- card.// -->
-
-
-
-    </aside> <!-- col.// -->
-
-    <div th:fragment = "side_filter">
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-      <div class="card">
-
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Price</h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label>Min</label>
-                  <input type="number" class="form-control" id="inputEmail4" placeholder="$0">
-                </div>
-                <div class="form-group col-md-6 text-right">
-                  <label>Max</label>
-                  <input type="number" class="form-control" placeholder="$1,0000">
-                </div>
-              </div>
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Genre</h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">bc</span>
-                <input type="checkbox" class="custom-control-input" id="Check10">
-                <label class="custom-control-label" for="Check10">Genre-0</label>
-              </div> <!-- form-check.// -->
-
-              <div class="custom-control custom-checkbox">
-                <span class="float-right badge badge-light round">bc</span>
-                <input type="checkbox" class="custom-control-input" id="Check20">
-                <label class="custom-control-label" for="Check20">Genre-1</label>
-              </div> <!-- form-check.// -->
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-
-        <article class="card-group-item">
-          <header class="card-header">
-            <h6 class="title">Sort by </h6>
-          </header>
-          <div class="filter-content">
-            <div class="card-body">
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
-			    By price
-			  </span>
-              </label>
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
-			    By sells
-			  </span>
-              </label>
-              <label class="form-check">
-                <input class="form-check-input" type="radio" name="exampleRadio" value="">
-                <span class="form-check-label">
-			    By popularity
-			  </span>
-              </label>
-            </div> <!-- card-body.// -->
-          </div>
-        </article> <!-- card-group-item.// -->
-      </div> <!-- card.// -->
+<!--            </form>-->
+        </div>
     </div>
-  </div> <!-- row.// -->
-
-
-
 </div>
-<!--container end.//-->
-
 
 
 </body>

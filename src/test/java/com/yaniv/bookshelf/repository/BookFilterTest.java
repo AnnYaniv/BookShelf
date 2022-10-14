@@ -27,7 +27,19 @@ class BookFilterTest {
 //                .filterByPrice(500,700)
                 .filterByGenres(asList(Genre.ADVENTURE, Genre.FANTASY))//TODO make this work
 //                .sortByPrice()
-                .getResults();
+                .getResults(0);
         books.forEach(System.out::println);
+    }
+
+    @Test
+    void paginationTest(){
+        BookFilter filter = target.clearQuery()
+                .filterByPrice(100,250)
+                .sortByPrice();
+        filter.getResults(0).forEach(book -> System.out.println(book.getIsbn()));
+        System.out.println("--------------------------------");
+        filter.getResults(1).forEach(book -> System.out.println(book.getIsbn()));
+        System.out.println("--------------------------------");
+        filter.getResults(2).forEach(book -> System.out.println(book.getIsbn()));
     }
 }

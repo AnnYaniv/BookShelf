@@ -15,6 +15,8 @@ public class FilterDto {
     Sort sort;
     List<Genre> genre;
 
+    Integer page;
+
     @Override
     public String toString() {
         return "FilterDto{" +
@@ -22,6 +24,7 @@ public class FilterDto {
                 ", max=" + max +
                 ", sort=" + sort +
                 ", genre=" + genre +
+                ", page=" + page +
                 '}';
     }
 }

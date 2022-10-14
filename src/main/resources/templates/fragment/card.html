@@ -10,8 +10,15 @@
 <body>
 
 <div class="card" th:fragment="card_small">
-    <img th:src="@{${'/covers/' + book.cover}}"
-         class="card-img-top" alt="Book"/>
+    <!--    <img th:src="@{${'/covers/' + book.cover}}"-->
+    <!--         class="card-img-top" alt="Book"/>-->
+    <div th:if="${book.cover != null}">
+        <img th:src="@{|/covers/${book.cover}|}" height="70" alt="non-nulll"/>
+    </div>
+    <div th:unless="${book.cover != null}">
+        <img src="/covers/no_cover.png" height="70" alt="nulll"/>
+    </div>
+
     <div class="card-body">
         <div class="d-flex justify-content-between">
 
@@ -42,7 +49,7 @@
 <div>
     <div class="col-md-6 col-lg-4 mb-4 mb-md-0">
         <div class="card text-black" th:fragment="card">
-            <img th:src="@{${'/covers/' + book.cover}}"
+            <img th:src="@{${(book.cover != null && !#strings.isEmpty(book.cover)) ? '/covers/' + book.cover : '/covers/no_cover.png'}}"
                  class="card-img-top"/>
             <div class="card-body">
                 <div class="text-center mt-1">
@@ -94,7 +101,8 @@
 
                     <p class="price-detail-wrap">
 	<span class="price h3 text-warning">
-		<span class="currency">Price: </span><span class="num" th:text="${book.price}"></span>
+		<span class="currency">Price: </span>
+        <span class="num" th:text="${book.price}"></span>
 	</span>
                     </p> <!-- price-detail-wrap .// -->
                     <dl class="item-property">
@@ -140,7 +148,8 @@
                     <hr>
                     <a href="#" class="btn btn-lg btn-dark text-uppercase">to favourite</a>
                     <a href="#" class="btn btn-lg btn-outline-dark text-uppercase">to cart</a>
-                    <a th:href="@{/book/edit(isbn=${book.isbn})}" class="btn btn-lg btn-warning text-uppercase">update</a>
+                    <a th:href="@{/book/edit(isbn=${book.isbn})}"
+                       class="btn btn-lg btn-warning text-uppercase">update</a>
                 </article> <!-- card-body.// -->
             </aside> <!-- col.// -->
         </div> <!-- row.// -->

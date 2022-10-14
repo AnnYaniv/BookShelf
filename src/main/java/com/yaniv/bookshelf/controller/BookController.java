@@ -6,7 +6,6 @@ import com.yaniv.bookshelf.mapper.BookMapper;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.enums.Genre;
-import com.yaniv.bookshelf.repository.BookFilter;
 import com.yaniv.bookshelf.service.AuthorService;
 import com.yaniv.bookshelf.service.BookService;
 import lombok.SneakyThrows;
@@ -17,20 +16,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.yaniv.bookshelf.dto.Sort.POPULARITY;
-import static com.yaniv.bookshelf.dto.Sort.PRICE;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/book")
 public class BookController {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BookController.class);
     private final BookService bookService;
     private final AuthorService authorService;
-
-    private String lastInsertedName = "";
 
     @Autowired
     public BookController(BookService bookService, AuthorService authorService) {
@@ -103,35 +100,31 @@ public class BookController {
     }
 
     @GetMapping("/filter")
-    public ModelAndView ajaxFilter(@RequestParam String name){
+    public ModelAndView ajaxFilter(@RequestParam String name, @RequestParam int page){
         LOGGER.info("ajaxFilter method was called for-{}", name);
-        LOGGER.info("Books-{}",bookService.findByNameLike(name));
-        lastInsertedName = name;
+        LOGGER.info("Books-{}",bookService.findByNameLike(name, page));
+        LOGGER.info("page-{}",page);
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        model.addObject("books",bookService.findByNameLike(name));
+        List<Book> books = StreamSupport.stream(bookService.findByNameLike(name, page).spliterator(), false).toList();
+        if((books.size() == 0)&&(page !=0 )){
+            page--;
+        }
+        model.addObject("books",bookService.findByNameLike(name, page));
+        model.addObject("page", page);
         return model;
     }
 
     @GetMapping("/getFilterBy")
     public ModelAndView getFilterBy(@ModelAttribute FilterDto filterDto){
         LOGGER.info("filter in getFilterBy: {}", filterDto);
-        BookFilter filter = bookService.createQuery();
-        if ((filterDto.getMin()!= null)&&(filterDto.getMax()!=null)){
-            filter.filterByPrice(filterDto.getMin(), filterDto.getMax());
+        List<Book> books = (List<Book>)bookService.filterBook(filterDto);
+        if((books.size() == 0)&&(filterDto.getPage() !=0 )){
+            filterDto.setPage(filterDto.getPage()-1);
         }
-        if((filterDto.getGenre()!=null)&&(!filterDto.getGenre().isEmpty())){
-            filter.filterByGenres(filterDto.getGenre());
-        }
-        switch (filterDto.getSort()) {
-            case PRICE -> filter.sortByPrice();
-            case POPULARITY -> filter.sortByPopularity();
-        }
+        books.forEach(book -> LOGGER.info("Book {}",book));
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        model.addObject("books",filter.getResults());
-        filter.getResults().forEach(arrEl ->
-                LOGGER.info("{}",arrEl)
-        );
-        System.out.println(model);
+        model.addObject("books",bookService.filterBook(filterDto));
+        model.addObject("page", filterDto.getPage());
         return model;
     }
 }

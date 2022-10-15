@@ -4,6 +4,7 @@ import com.yaniv.bookshelf.dto.AuthorDto;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,6 +21,7 @@ public class AuthorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('author:read')")
     public ModelAndView editAuthors(){
         ModelAndView model = new ModelAndView("author_edit");
         Author author = new Author();
@@ -30,6 +32,7 @@ public class AuthorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('author:write')")
     public String createAuthor(@ModelAttribute AuthorDto authorDto){
         return authorDto.getId() + "<br>" + authorDto.getFirstName() + "<br>" + authorDto.getLastName() + "</br>";
     }

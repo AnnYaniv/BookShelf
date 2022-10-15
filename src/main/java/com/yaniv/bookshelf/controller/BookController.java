@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -81,8 +82,10 @@ public class BookController {
         return modelAndView;
     }
 
+
     @SneakyThrows
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('book:write')")
     public String updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
         bookService.save(book);
@@ -92,6 +95,7 @@ public class BookController {
 
     @SneakyThrows
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('book:write')")
     public String createBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
         bookService.save(book);

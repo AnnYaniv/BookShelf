@@ -1,4 +1,4 @@
-<header class="p-3 bg-dark text-white" th:fragment="header">
+<header class="p-3 bg-dark text-white" th:fragment="header" xmlns:sec="http://www.w3.org/1999/xhtml">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a href="/static" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
@@ -9,19 +9,25 @@
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="/" class="nav-link px-4 text-secondary">BookShelf</a></li>
-                <li><a href="#" class="nav-link px-3 text-white">Favourite</a></li>
+                <li><a href="/favourite" class="nav-link px-3 text-white">Favourite</a></li>
                 <li><a href="#" class="nav-link px-3 text-white">Cart</a></li>
-                <li><a href="#" class="nav-link px-3 text-white">Profile</a></li>
+                <li><a href="/user" class="nav-link px-3 text-white">Profile</a></li>
             </ul>
 
             <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                 <input id="search-input" type="search" class="form-control form-control-dark" placeholder="Search..."
                        aria-label="Search">
             </form>
-
-            <div class="text-end">
-                <button type="button" class="btn btn-outline-light me-2">Login</button>
+            <div class="text-end" sec:authorize="!isAuthenticated()">
+                <a href="/auth/login">
+                    <button type="button" class="btn btn-outline-light me-2">Login</button>
+                </a>
                 <button type="button" class="btn btn-warning">Sign-up</button>
+            </div>
+            <div class="text-end" sec:authorize="isAuthenticated()">
+                <form sec:authorize="isAuthenticated()" action="/auth/logout" method="POST">
+                    <button type="submit" class="btn btn-outline-light me-2">Logout</button>
+                </form>
             </div>
         </div>
     </div>

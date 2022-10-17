@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
     private final DaoAuthenticationProvider daoAuthenticationProvider;
@@ -18,7 +17,7 @@ public class AuthController {
         this.daoAuthenticationProvider = daoAuthenticationProvider;
     }
 
-    @GetMapping("/login")
+    @GetMapping("/auth/login")
     public ModelAndView getLoginPage() {
         return new ModelAndView("login");
     }

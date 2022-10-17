@@ -2,7 +2,7 @@ package com.yaniv.bookshelf.service;
 
 import com.yaniv.bookshelf.dto.FilterDto;
 import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.repository.BookFilter;
+import com.yaniv.bookshelf.repository.impl.BookFilter;
 import com.yaniv.bookshelf.repository.BookRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

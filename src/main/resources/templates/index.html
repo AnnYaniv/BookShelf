@@ -36,19 +36,6 @@
 </div>
 
 <section id="selection_books" style="background-color: #eee;margin-left:25%">
-    <!--    <div class="container py-5">-->
-    <!--        <button text="qqqqq" onclick="qwert"></button>-->
-    <!--        <nav aria-label="Page navigation example" th:replace="fragment/pagination :: pagination(page=${page})"></nav>-->
-    <!--        <div class="w-100 p-3">-->
-    <!--            <div class="row justify-content-center">-->
-    <!--                <div class="col-md-8 col-lg-6 col-xl-4" th:each="book : ${books}">-->
-    <!--                    <div th:replace="fragment/card :: card(book=${book})"-->
-    <!--                         style="height: 30%; width: 30%"></div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </div>-->
-
     <div th:replace="fragment/book_selection :: selection(page=${page}, books=${books})"></div>
 </section>
 

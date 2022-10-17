@@ -2,6 +2,7 @@ package com.yaniv.bookshelf.repository;
 
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.enums.Genre;
+import com.yaniv.bookshelf.repository.impl.BookFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,8 @@
-package com.yaniv.bookshelf.repository;
+package com.yaniv.bookshelf.repository.impl;
 
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.enums.Genre;
+import com.yaniv.bookshelf.repository.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class BookFilter {
+public class BookFilter implements Filter<Book> {
     private static final int PAGE_SIZE = 9;
     private final EntityManager entityManager;
     private CriteriaBuilder criteriaBuilder;
@@ -26,6 +27,7 @@ public class BookFilter {
         this.entityManager = entityManager;
     }
 
+    @Override
     public BookFilter clearQuery(){
         predicates = new ArrayList<>();
         criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -56,6 +58,7 @@ public class BookFilter {
         return this;
     }
 
+    @Override
     public Iterable<Book> getResults(int page) {
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         if(predicateArray.length > 0) {

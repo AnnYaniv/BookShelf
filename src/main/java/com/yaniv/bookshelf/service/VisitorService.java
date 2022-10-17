@@ -27,7 +27,9 @@ public class VisitorService {
     public Optional<Visitor> findById(String id){
         return visitorRepository.findById(id);
     }
-
+    public Optional<Visitor> findByEmail(String email){
+        return visitorRepository.findByEmail(email);
+    }
     public Visitor createUser(Visitor visitor){
         LOGGER.info(String.valueOf(visitor));
         visitor.setRole(Role.USER);

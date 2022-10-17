@@ -1,5 +1,6 @@
 package com.yaniv.bookshelf.model;
 
+import com.yaniv.bookshelf.model.ids.ReviewId;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

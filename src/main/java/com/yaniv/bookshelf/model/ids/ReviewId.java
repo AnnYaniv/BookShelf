@@ -1,5 +1,7 @@
-package com.yaniv.bookshelf.model;
+package com.yaniv.bookshelf.model.ids;
 
+import com.yaniv.bookshelf.model.Book;
+import com.yaniv.bookshelf.model.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

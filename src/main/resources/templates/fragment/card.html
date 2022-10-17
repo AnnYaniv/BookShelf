@@ -89,7 +89,12 @@
             <aside class="col-sm-5 border-right">
                 <article class="gallery-wrap">
                     <div class="img-big-wrap">
-                        <div><img th:src="@{${'/covers/' + book.cover}}" style="max-width:100%;max-height:100%"></div>
+                        <div th:if="${book.cover != null}">
+                            <img th:src="@{|/covers/${book.cover}|}" style="max-width:100%;max-height:100%" alt="non-nulll"/>
+                        </div>
+                        <div th:unless="${book.cover != null}">
+                            <img src="/covers/no_cover.png" style="max-width:100%;max-height:100%" alt="nulll"/>
+                        </div>
                     </div> <!-- slider-product.// -->
                 </article> <!-- gallery-wrap .end// -->
             </aside>
@@ -125,6 +130,10 @@
                         <dt class="col-sm-3">Publishing house</dt>
                         <dd class="col-sm-5" th:text="${book.publishingHouse}"></dd>
                     </dl>  <!-- item-property-hor .// -->
+                    <dl class="row">
+                        <dt class="col-sm-3">ISBN</dt>
+                        <dd class="col-sm-5" th:text="${book.isbn}" id="isbn-label"></dd>
+                    </dl>  <!-- item-property-hor .// -->
                     <hr>
                     <div class="row">
                         <div class="col-sm-7">
@@ -146,7 +155,7 @@
                         </div> <!-- col.// -->
                     </div> <!-- row.// -->
                     <hr>
-                    <a href="#" class="btn btn-lg btn-dark text-uppercase">to favourite</a>
+                    <a href="#" id="fav-a"><button id="fav-btn" name="fav-btn" class="btn btn-lg btn-dark text-uppercase">to favourite</button></a>
                     <a href="#" class="btn btn-lg btn-outline-dark text-uppercase">to cart</a>
                     <a th:href="@{/book/edit(isbn=${book.isbn})}"
                        class="btn btn-lg btn-warning text-uppercase">update</a>

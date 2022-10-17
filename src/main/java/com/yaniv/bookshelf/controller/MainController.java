@@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
 public class MainController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
     private final BookService bookService;
-    private AuthorService authorService;
+    private final AuthorService authorService;
 
     @Autowired
     public MainController(BookService bookService, AuthorService authorService) {
@@ -33,7 +33,6 @@ public class MainController {
         modelAndView.addObject("filterDto", filterDto);
         modelAndView.addObject("books", bookService.getAll(0));
         modelAndView.addObject("page",0);
-        bookService.getAll(0).forEach(book -> LOGGER.info("Book {} url {}", book.getIsbn(), book.getCover()));
         return modelAndView;
     }
 
@@ -46,7 +45,6 @@ public class MainController {
         }
         modelAndView.addObject("books", bookService.getAll(page));
         modelAndView.addObject("page",page);
-        bookService.getAll(page).forEach(book -> LOGGER.info("Book {} url {}", book.getIsbn(), book.getCover()));
         return modelAndView;
     }
 }

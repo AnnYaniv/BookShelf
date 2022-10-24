@@ -39,20 +39,7 @@
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
         crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-    function onPageFilter(page) {
-        $.ajax({
-            type: "GET",
-            url: "/favourite/pageable?page=" + page,
-            success: function (data, textStatus, jQxhr) {
-                console.log("without anything");
-                $('#selection_books').html(data);
-            },
-            error: function (jqXhr, textStatus, errorThrown) {
-                console.log(errorThrown);
-            }
-        });
-    }
-</script>
+<script src="script/filter_book.js"></script>
+<script src="script/cart.js"></script>
 </body>
 </html>

@@ -74,7 +74,6 @@ public class Book {
                 "isbn='" + isbn + '\'' +
                 ", name='" + name + '\'' +
                 ", author=" + author +
-//                ", annotation='" + annotation + '\'' +
                 ", genre=" + genre +
                 ", year=" + year +
                 ", publishingHouse='" + publishingHouse + '\'' +

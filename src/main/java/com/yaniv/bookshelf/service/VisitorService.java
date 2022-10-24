@@ -20,6 +20,10 @@ public class VisitorService {
         this.visitorRepository = visitorRepository;
     }
 
+    public Visitor save(Visitor visitor){
+        return visitorRepository.save(visitor);
+    }
+
     public Iterable<Visitor> getAll() {
         return visitorRepository.findAll();
     }

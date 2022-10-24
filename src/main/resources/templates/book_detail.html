@@ -20,29 +20,6 @@
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
         crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-    $('#fav-a').on('click', function () {
-        var isbn = $('#isbn-label').text();
-        console.log(isbn);
-        $.post('/favourite/add', {isbn: isbn}, function(response){
-            console.log(response);
-        });
-
-        //
-        // $.ajax({
-        //     type: "POST",
-        //     url: "/favourite/add",
-        //     data: isbn,
-        //     success: function (data, textStatus, jQxhr) {
-        //         console.log(data);
-        //     },
-        //     error: function (jqXhr, textStatus, errorThrown) {
-        //         console.log(errorThrown);
-        //     }
-        //
-        // });
-        // e.preventDefault();
-    })
-</script>
+<script src="script/cart.js"></script>
 </body>
 </html>

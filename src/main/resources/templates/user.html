@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your page</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        .flex-fill {
+            flex: 1 1 auto;
+        }
+    </style>
+</head>
+<body>
+<header th:replace="fragment/header :: header"></header>
+<div class="main h-100 d-flex flex-column">
+    <div class="container-fluid d-flex flex-fill">
+        <div class="row flex-fill">
+            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li>
+                        <a id="dashboard" href="#" class="nav-link text-white">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a id="invoices"  href="#" class="nav-link text-white">
+                            Orders
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link text-white">
+                            Products
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="data-container" class="col p-0" style="background-color: #eee;">
+                <br>
+                <p> <- Click to choose something</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script src="/script/user.js"></script>
+
+</body>
+</html>

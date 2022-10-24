@@ -74,13 +74,63 @@
                                 Learn more
                             </button>
                         </a>
-                        <button type="button" class="btn btn-dark flex-fill ms-1">To cart</button>
+                        <button type="button" class="btn btn-dark flex-fill ms-1" th:attr="onclick=|addProductToCart('${book.isbn}')|">To cart</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="card-body p-4" th:fragment="card_invoice">
+    <div class="row d-flex align-items-center">
+        <div class="col-md-2 col-lg-2 col-xl-2">
+        </div>
+        <div class="col-md-3 col-lg-3 col-xl-3">
+            <p class="lead fw-normal mb-2" th:text="${#temporals.format(invoice.orderedAt, 'dd-MM-yyyy HH:mm')}"></p>
+        </div>
+        <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+            <p class="lead fw-normal mb-2" th:text="${invoice.status}"></p>
+        </div>
+        <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+            <a th:href="@{'/cart/by-id?id='+${invoice.id}}"><button type="button" class="btn btn-info">Learn more</button></a>
+        </div>
+    </div>
+</div>
+
+    <div class="card-body p-4" th:fragment="card_cart">
+        <div class="row d-flex align-items-center">
+            <div class="col-md-2 col-lg-2 col-xl-2">
+                <img th:src="@{${(book.book.cover != null && !#strings.isEmpty(book.book.cover)) ? '/covers/' + book.book.cover : '/covers/no_cover.png'}}"
+                        class="img-fluid rounded-3" alt="Cotton T-shirt">
+            </div>
+            <div class="col-md-3 col-lg-3 col-xl-3">
+                <p class="lead fw-normal mb-2" th:text="${book.book.name}"></p>
+                <p><span class="text-muted" th:text="'Authors: ' + ${#strings.arrayJoin(book.book.author,',')}"> </span> <span class="text-muted" th:text="${book.book.isbn}"> </span></p>
+            </div>
+            <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                <button class="btn btn-link px-2"
+                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                    <i class="fas fa-minus"></i>
+                </button>
+
+                <input th:id="${book.book.isbn}+'input'" min="1" name="quantity" th:value="${book.quantity}" type="number"
+                       class="form-control form-control-sm" th:attr="onchange=|on_change(${book.book.price},'${book.book.isbn}')|"/>
+
+                <button class="btn btn-link px-2"
+                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                <h5 class="mb-0" th:id="${book.book.isbn}+'price'" th:text="${book.book.price} * ${book.quantity}"></h5>
+            </div>
+            <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                <a th:attr="onclick=|delete_book('${book.book.isbn}')|" class="text-danger"><button type="button" class="btn btn-danger">Delete</button></a>
+            </div>
+<!--            delete_book(isbn)-->
+        </div>
+    </div>
 
 <div class="container" th:fragment="big_card">
     <br>
@@ -156,7 +206,8 @@
                     </div> <!-- row.// -->
                     <hr>
                     <a href="#" id="fav-a"><button id="fav-btn" name="fav-btn" class="btn btn-lg btn-dark text-uppercase">to favourite</button></a>
-                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase">to cart</a>
+                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase" th:attr="onclick=|addProductToCart('${book.isbn}')|"
+                       >to cart</a>
                     <a th:href="@{/book/edit(isbn=${book.isbn})}"
                        class="btn btn-lg btn-warning text-uppercase">update</a>
                 </article> <!-- card-body.// -->

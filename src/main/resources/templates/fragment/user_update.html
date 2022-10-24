@@ -1,0 +1,32 @@
+<div class="container py-5" th:fragment="update">
+    <form class="not-validated" method="post">
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <label for="email">Email</label>
+                <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}" required>
+                <div class="invalid-feedback">Add email</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="username">Username</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">@</span>
+                    </div>
+                    <input id="username" th:value="${visitor.userName}" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="p_house">Password</label>
+                <input type="text" class="form-control" id="p_house"
+                       placeholder="Password">
+                <div class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button type="button" class="btn btn-success" id="update">Update</button>
+            </div>
+            <label th:text="${additionInfo}"></label>
+        </div>
+    </form>
+</div>
+<script src="/script/user_update.js"></script>

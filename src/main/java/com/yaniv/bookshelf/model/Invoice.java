@@ -4,6 +4,7 @@ import com.yaniv.bookshelf.model.enums.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class Invoice {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -30,4 +32,14 @@ public class Invoice {
 
     @ManyToOne
     private Visitor buyer;
+
+    @PrePersist
+    public void prePersist() {
+        if(orderedAt == null) {
+            orderedAt = LocalDateTime.now();
+        }
+        if(status == null) {
+            status = OrderStatus.CREATING;
+        }
+    }
 }

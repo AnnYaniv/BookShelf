@@ -43,18 +43,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/book").permitAll()
                 .antMatchers("/book/filter").permitAll()
                 .antMatchers("/book/getFilterBy").permitAll()
+                .antMatchers("/styles/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/auth/login").permitAll()
-                .defaultSuccessUrl("//")
+                .defaultSuccessUrl("/user")
                 .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout", "POST"))
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID", "invoice")
                 .logoutSuccessUrl("/auth/login");
     }
 

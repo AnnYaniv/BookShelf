@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoices</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+</head>
+<body>
+<section class="h-100" style="background-color: #eee;">
+    <div class="container h-100 py-5">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-10">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-normal mb-0 text-black">Invoices</h3>
+                </div>
+
+                <div class="card rounded-3 mb-4" th:each="invoice : ${invoices}">
+                    <div th:replace="fragment/card :: card_invoice(invoice=${invoice})"></div>
+                </div>
+
+                <div class="card rounded-3 mb-4" th:if="${invoices.isEmpty()}">
+                    </br>
+                    <p><span class="text-muted">No invoices</span></p>
+                    </br>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

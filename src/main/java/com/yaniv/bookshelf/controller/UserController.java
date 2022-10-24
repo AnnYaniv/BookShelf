@@ -1,5 +1,7 @@
 package com.yaniv.bookshelf.controller;
 
+import com.yaniv.bookshelf.dto.VisitorDto;
+import com.yaniv.bookshelf.mapper.VisitorMapper;
 import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.security.SecurityUser;
 import com.yaniv.bookshelf.service.VisitorService;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 
@@ -17,7 +20,6 @@ import java.security.Principal;
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final VisitorService visitorService;
-
 
     @Autowired
     public UserController(VisitorService visitorService) {
@@ -31,15 +33,27 @@ public class UserController {
     }
 
     @GetMapping
-    public String getInfo() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-            LOGGER.info("visitor - {}" ,visitorService.findByEmail(username));
-        } else {
-            username = principal.toString();
-        }
-        return username;
+    public ModelAndView getInfo() {
+        return new ModelAndView("user");
+    }
+
+    @GetMapping("/about")
+    public ModelAndView getInfoById(Principal principal) {
+        Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
+        ModelAndView model = new ModelAndView("fragment/user_update");
+        model.addObject("visitor", visitor);
+        model.addObject("additionInfo", "");
+        return model;
+    }
+
+    @PostMapping("/about")
+    public ModelAndView updateUser(Principal principal, VisitorDto visitorDto) {
+        LOGGER.info("post /user/about");
+        Visitor visitor = visitorService.save(VisitorMapper.toVisitor(visitorDto,
+                visitorService.findByEmail(principal.getName()).orElse(new Visitor())));
+        ModelAndView model = new ModelAndView("fragment/user_update");
+        model.addObject("visitor", visitor);
+        model.addObject("additionInfo", "Updated successfully");
+        return model;
     }
 }

@@ -1,14 +1,15 @@
 package com.yaniv.bookshelf.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.yaniv.bookshelf.model.enums.BookType;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Getter
 @Setter
 @Entity
@@ -22,12 +23,12 @@ public class OrderedBook {
     private Book book;
 
     @Min(1)
-    private int countInOrder;
+    private int quantity;
 
     private double price;
 
-    @ManyToOne
-    private Invoice invoice;
+    @Enumerated(EnumType.STRING)
+    private BookType bookType;
 
     @PrePersist
     public void prePersist() {

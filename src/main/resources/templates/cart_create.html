@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proceed payment</title>
+    <link rel="stylesheet" href="/css/cart_stylesheet.css">
+    <link rel="stylesheet" href="https://mdbcdn.b-cdn.net/wp-content/themes/mdbootstrap4/docs-app/css/dist/mdb5/standard/core.min.css">
+</head>
+<body style="background-color: #E5E4E2">
+<header th:replace="fragment/header :: header"></header>
+<div class="container" style="background-color: #E5E4E2">
+    <h2>Cart details <small th:text="${'total: ' + total}"></small></h2>
+    <ul class="responsive-table">
+        <li class="table-header">
+            <div class="col col-1">Book</div>
+            <div class="col col-2">Author</div>
+            <div class="col col-3">Book type</div>
+            <div class="col col-4">Price</div>
+            <div class="col col-5">Quantity</div>
+        </li>
+        <li class="table-row" th:each="book : ${books}">
+            <div class="col col-1" data-label="Book name" th:text="${book.book.name}">book name</div>
+            <div class="col col-2" data-label="Author" th:text="${#strings.listJoin(book.book.author,',')}">author</div>
+            <div class="col col-3" data-label="Book type" th:text="${book.bookType}">ELECTRONIC</div>
+            <div class="col col-4" data-label="Price" th:text="${book.price}">200</div>
+            <div class="col col-5" data-label="Quantity" th:text="${book.quantity}">1</div>
+        </li>
+        <li>
+            <div class="col col-1"></div>
+            <div class="col col-2"></div>
+            <div class="col col-3"></div>
+            <div class="col-4">
+                <a href="/cart"><button type="button" class="btn btn-info" style="font-size: 16px">Return</button></a>
+            </div>
+            <div class="col col-5">
+                <a id="create-cart-button" href="/user"><button type="button" class="btn btn-warning" style="font-size: 16px">Pay</button></a>
+            </div>
+        </li>
+    </ul>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script src="/script/cart.js"></script>
+</body>
+</html>

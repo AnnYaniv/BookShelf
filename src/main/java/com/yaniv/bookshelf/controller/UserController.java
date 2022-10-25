@@ -3,13 +3,11 @@ package com.yaniv.bookshelf.controller;
 import com.yaniv.bookshelf.dto.VisitorDto;
 import com.yaniv.bookshelf.mapper.VisitorMapper;
 import com.yaniv.bookshelf.model.Visitor;
-import com.yaniv.bookshelf.security.SecurityUser;
 import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -56,4 +54,5 @@ public class UserController {
         model.addObject("additionInfo", "Updated successfully");
         return model;
     }
+
 }

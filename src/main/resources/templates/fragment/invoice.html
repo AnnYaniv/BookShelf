@@ -1,0 +1,29 @@
+<div class="container" style="background-color: #eee; color: black">
+    <link rel="stylesheet" href="/css/cart_stylesheet.css">
+    <h2>Cart details <small th:text="${'total: ' + total}"></small></h2>
+    <ul class="responsive-table">
+        <li class="table-header">
+            <div class="col col-1">Book</div>
+            <div class="col col-2">Author</div>
+            <div class="col col-3">Book type</div>
+            <div class="col col-4">Price</div>
+            <div class="col col-5">Quantity</div>
+        </li>
+        <li class="table-row" th:each="book : ${books}">
+            <a th:href="${'/book?isbn='+book.book.isbn}" class="col col-1"><div data-label="Book name" th:text="${book.book.name}">book name</div></a>
+            <div class="col col-2" data-label="Author" th:text="${#strings.listJoin(book.book.author,',')}">author</div>
+            <div class="col col-3" data-label="Book type" th:text="${book.bookType}">ELECTRONIC</div>
+            <div class="col col-4" data-label="Price" th:text="${book.price}">200</div>
+            <div class="col col-5" data-label="Quantity" th:text="${book.quantity}">1</div>
+        </li>
+        <li>
+            <div class="col col-1"></div>
+            <div class="col col-2"></div>
+            <div class="col col-3"></div>
+            <div class="col col-4"></div>
+            <div class="col-5">
+                <button type="button" id="return-cart" onclick="cart_return()" class="btn btn-info" style="font-size: 16px">Return</button>
+            </div>
+        </li>
+    </ul>
+</div>

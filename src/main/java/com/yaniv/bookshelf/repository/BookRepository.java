@@ -18,6 +18,16 @@ public interface BookRepository extends JpaRepository<Book, String> {
     @Query("select book from Book book where book.name like concat('%', :bookName, '%')")
     Page<Book> findByNameLike(@Param("bookName") String name, Pageable pageable);
 
+    @Query("select distinct book from Invoice inv join inv.buyer visitor " +
+            "join inv.booksInOrder bookOrder join bookOrder.book book where visitor.id = :userId")
+    Page<Book> findByUser(@Param("userId") String id, Pageable pageable);
+
+    @Query("select distinct book from Invoice inv join inv.buyer visitor " +
+            "join inv.booksInOrder bookOrder join bookOrder.book book " +
+            "where visitor.id = :userId and bookOrder.bookType = 'ELECTRONIC'")
+    Page<Book> findByUserElectronic(@Param("userId") String id, Pageable pageable);
+
+
     @Override
     Page<Book> findAll(Pageable pageable);
 }

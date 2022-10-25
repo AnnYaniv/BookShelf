@@ -5,6 +5,17 @@ function addProductToCart(isbn){
     });
 }
 
+function addElectronicVersionToCart(isbn){
+    if(document.querySelector('input[name="version"]:checked').value == "ELECTRONIC") {
+        console.log("Electronic");
+        $.post('/cart/add-electronic', {isbn: isbn}, function (response) {
+            console.log(response);
+        });
+    } else {
+        addProductToCart(isbn);
+    }
+}
+
 function on_change(price, isbn){
     var sum = $('#'+isbn+'input').val() * price;
     $('#'+isbn+'price').text(sum);
@@ -26,6 +37,22 @@ function delete_book(isbn) {
     $.ajax({
         type: "DELETE",
         url: "/cart",
+        data: {isbn: isbn},
+        success: function (data, textStatus, jQxhr) {
+            window.location.reload();
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+
+    });
+}
+
+function delete_electronic(isbn) {
+    console.log(isbn);
+    $.ajax({
+        type: "DELETE",
+        url: "/cart/delete-electronic",
         data: {isbn: isbn},
         success: function (data, textStatus, jQxhr) {
             window.location.reload();

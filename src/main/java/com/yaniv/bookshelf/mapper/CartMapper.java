@@ -2,19 +2,15 @@ package com.yaniv.bookshelf.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.model.Invoice;
-import com.yaniv.bookshelf.model.OrderedBook;
-import com.yaniv.bookshelf.model.Visitor;
-import com.yaniv.bookshelf.model.enums.BookType;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class CartMapper {
     private final ObjectMapper objectMapper;
@@ -30,6 +26,22 @@ public class CartMapper {
             cart = objectMapper.readValue(URLDecoder.decode(invoice, "UTF-8"), Map.class);
         }
         return cart;
+    }
+
+    @SneakyThrows
+    public Set<String> toSet(String invoice){
+        Set<String> cart = new HashSet<>();
+        if(!StringUtils.isBlank(invoice)){
+            cart = objectMapper.readValue(URLDecoder.decode(invoice, "UTF-8"), Set.class);
+        }
+        return cart;
+    }
+
+    @SneakyThrows
+    public String setToJson(Set<String> cart) {
+        StringWriter writer = new StringWriter();
+        objectMapper.writeValue(writer, cart);
+        return writer.getBuffer().toString();
     }
 
     @SneakyThrows

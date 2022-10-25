@@ -42,10 +42,10 @@ public class InvoiceController {
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/add")
-    public ResponseEntity addProduct(@CookieValue(value = "invoice", required=false) String invoice, String isbn) throws IOException {
+    public ResponseEntity addProduct(@CookieValue(value = "invoice", required = false) String invoice, String isbn) throws IOException {
         LOGGER.info("book: {}", isbn);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
-        if(cart.containsKey(isbn)){
+        if (cart.containsKey(isbn)) {
             cart.put(isbn, cart.get(isbn) + 1);
         } else {
             cart.put(isbn, 1);
@@ -58,17 +58,38 @@ public class InvoiceController {
                 .build();
     }
 
+    @ResponseStatus(value = HttpStatus.OK)
+    @PostMapping("/add-electronic")
+    public ResponseEntity addElectronic(@CookieValue(value = "elversion", required = false) String invoice, String isbn) throws IOException {
+        LOGGER.info("book electronic: {}", isbn);
+        Set<String> cart = cartMapper.toSet(invoice);
+        cart.add(isbn);
+        LOGGER.info("invoice: {}", cart);
+        var cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
+                .path("/cart").build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @GetMapping
     @SneakyThrows
-    public ModelAndView getInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice) {
+    public ModelAndView getInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
+                                   @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
         ModelAndView modelAndView = new ModelAndView("cart");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
+        Set<String> cartElect = cartMapper.toSet(elVersion);
         LOGGER.info("Cart: {}", invoice);
-        if(cart != null) {
-            List<OrderedBook> books = cart.entrySet().stream().map(entry ->
+        if (cart != null) {
+            List<OrderedBook> books = new ArrayList<>(cart.entrySet().stream().map(entry ->
                     new OrderedBook("id", bookService.findById(entry.getKey()).orElse(new Book()),
-                            entry.getValue(), 0, BookType.PAPER)).toList();
-
+                            entry.getValue(), 0, BookType.PAPER)).toList());
+            if (cartElect != null) {
+                for (String id : cartElect) {
+                    books.add(new OrderedBook("id", bookService.findById(id).orElse(new Book()),
+                            1, 0, BookType.ELECTRONIC));
+                }
+            }
             modelAndView.addObject("books", books);
         } else {
             modelAndView.addObject("books", new LinkedList<OrderedBook>());
@@ -76,12 +97,27 @@ public class InvoiceController {
         return modelAndView;
     }
 
+    @DeleteMapping("/delete-electronic")
+    @SneakyThrows
+    public ResponseEntity deleteElectronic(@RequestParam String isbn,
+                                           @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
+        LOGGER.info("On delete electronic {}", isbn);
+        Set<String> cart = cartMapper.toSet(elVersion);
+        LOGGER.info("Invoice {}", cart);
+        cart.remove(isbn);
+        ResponseCookie cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
+                .path("/cart").build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @DeleteMapping
     @SneakyThrows
-    public ResponseEntity delete(@RequestParam String isbn, @CookieValue(value = "invoice", defaultValue = "null") String invoice){
+    public ResponseEntity delete(@RequestParam String isbn, @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
         LOGGER.info("On delete {}", isbn);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
-        LOGGER.info("Invoice {}",cart);
+        LOGGER.info("Invoice {}", cart);
         cart.remove(isbn);
         ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
                 .path("/cart").build();
@@ -92,7 +128,7 @@ public class InvoiceController {
 
     @PutMapping
     @SneakyThrows
-    public ResponseEntity update(@RequestParam String isbn, @RequestParam int count, @CookieValue(value = "invoice", defaultValue="null") String invoice){
+    public ResponseEntity update(@RequestParam String isbn, @RequestParam int count, @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
         LOGGER.info("On update {}-{}", isbn, count);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         cart.put(isbn, count);
@@ -106,42 +142,61 @@ public class InvoiceController {
 
     @PostMapping("/create")
     @SneakyThrows
-    public ResponseEntity createInvoice(@CookieValue(value = "invoice", defaultValue="null") String invoice, Principal principal){
+    public ResponseEntity createInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
+                                        @CookieValue(value = "elversion", defaultValue = "null") String elVersion,
+                                        Principal principal) {
         LOGGER.info("Create invoice");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
-        if(!cart.isEmpty()){
-            Set<OrderedBook> books = cart.entrySet().stream().map(entry ->
-                    new OrderedBook(null, bookService.findById(entry.getKey()).orElse(new Book()),
-                            entry.getValue(), bookService.findById(entry.getKey()).orElse(new Book()).getPrice(),
-                            BookType.PAPER))
-                    .collect(Collectors.toSet());
-            Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
+        Set<String> cartElect = cartMapper.toSet(elVersion);
 
-            Invoice inv = new Invoice();
-            inv.setBooksInOrder(books);
-            inv.setBuyer(visitor);
-
-            invoiceService.save(inv);
-            ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(new HashMap<>())))
-                    .path("/cart").maxAge(0).build();
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .build();
-        } else {
-            return ResponseEntity.badRequest()
-                    .build();
+        LOGGER.info("Create paper");
+        Set<OrderedBook> books = cart.entrySet().stream().map(entry ->
+                        new OrderedBook(null, bookService.findById(entry.getKey()).orElse(new Book()),
+                                entry.getValue(), bookService.findById(entry.getKey()).orElse(new Book()).getPrice(),
+                                BookType.PAPER))
+                .collect(Collectors.toSet());
+        if (cartElect != null) {
+            LOGGER.info("Create electronic");
+            for (String id : cartElect) {
+                books.add(new OrderedBook(null, bookService.findById(id).orElse(new Book()),
+                        1, bookService.findById(id).orElse(new Book()).getPrice(), BookType.ELECTRONIC));
+            }
         }
+        Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
+
+        Invoice inv = new Invoice();
+        inv.setBooksInOrder(books);
+        inv.setBuyer(visitor);
+
+        invoiceService.save(inv);
+        ResponseCookie cookie = ResponseCookie.from("invoice",
+                        URLEncoder.encode(cartMapper.toJson(new HashMap<>())))
+                .path("/cart").maxAge(0).build();
+        ResponseCookie cookieElectronic = ResponseCookie.from("elversion",
+                        URLEncoder.encode(cartMapper.setToJson(new HashSet<>())))
+                .path("/cart").maxAge(0).build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString())
+                .build();
     }
 
     @GetMapping("/create")
-    public ModelAndView createInvoice(@CookieValue(value = "invoice", defaultValue="null") String invoice){
+    public ModelAndView createInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
+                                      @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
         Map<String, Integer> cart = cartMapper.toMap(invoice);
+        Set<String> cartElect = cartMapper.toSet(elVersion);
         ModelAndView model = new ModelAndView("cart_create");
         Set<OrderedBook> books = cart.entrySet().stream().map(entry ->
                         new OrderedBook(null, bookService.findById(entry.getKey()).orElse(new Book()),
                                 entry.getValue(), bookService.findById(entry.getKey()).orElse(new Book()).getPrice(),
                                 BookType.PAPER))
                 .collect(Collectors.toSet());
+        if (cartElect != null) {
+            for (String id : cartElect) {
+                books.add(new OrderedBook(null, bookService.findById(id).orElse(new Book()),
+                        1, bookService.findById(id).orElse(new Book()).getPrice(), BookType.ELECTRONIC));
+            }
+        }
         model.addObject("books", books);
         model.addObject("total", books.stream()
                 .mapToDouble(orderedBook -> orderedBook.getPrice() * orderedBook.getQuantity()).sum());
@@ -149,22 +204,21 @@ public class InvoiceController {
     }
 
     @GetMapping("/all")
-    public ModelAndView all(Principal principal){
+    public ModelAndView all(Principal principal) {
         List<Invoice> invoices = invoiceService.getAllByEmail(principal.getName());
-
         ModelAndView model = new ModelAndView("fragment/all_invoices");
         model.addObject("invoices", invoices);
         return model;
     }
 
     @GetMapping("/by-id")
-    public String getById(@RequestParam String id) {
+    public ModelAndView getById(@RequestParam String id) {
         Optional<Invoice> optionalInvoice = invoiceService.findById(id);
         Invoice invoice = optionalInvoice.orElse(new Invoice());
-        return invoice.getId() + "<br>"
-                + invoice.getBooksInOrder() + "<br>"
-                + invoice.getBuyer() + "<br>"
-                + invoice.getStatus() + "<br>"
-                + invoice.getOrderedAt() + "<br>";
+        ModelAndView modelAndView = new ModelAndView("fragment/invoice");
+        modelAndView.addObject("books", invoice.getBooksInOrder());
+        modelAndView.addObject("total", invoice.getBooksInOrder().stream()
+                .mapToDouble(orderedBook -> orderedBook.getPrice() * orderedBook.getQuantity()).sum());
+        return modelAndView;
     }
 }

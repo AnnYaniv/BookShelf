@@ -14,6 +14,7 @@ import java.util.Optional;
 @Service
 @NoArgsConstructor
 public class BookService {
+    private static final int ITEMS_PER_PAGE = 9;
     private BookRepository bookRepository;
     private BookFilter bookFilter;
 
@@ -24,7 +25,7 @@ public class BookService {
     }
 
     public Iterable<Book> getAll(int page){
-        return bookRepository.findAll(PageRequest.of(page, 9));
+        return bookRepository.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
     public Book save(Book book){
@@ -35,7 +36,15 @@ public class BookService {
         return bookRepository.findByIsbn(id);
     }
     public Iterable<Book> findByNameLike(String name, int page){
-        return bookRepository.findByNameLike(name, PageRequest.of(page, 9));
+        return bookRepository.findByNameLike(name, PageRequest.of(page, ITEMS_PER_PAGE));
+    }
+
+    public Iterable<Book> findByUser(String id, int page){
+        return bookRepository.findByUser(id, PageRequest.of(page, ITEMS_PER_PAGE));
+    }
+
+    public Iterable<Book> findByUserElectronic(String id, int page){
+        return bookRepository.findByUserElectronic(id, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
     public Iterable<Book> filterBook(FilterDto filterDto){

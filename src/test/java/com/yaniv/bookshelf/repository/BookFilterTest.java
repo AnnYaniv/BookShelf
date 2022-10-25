@@ -26,7 +26,7 @@ class BookFilterTest {
     void fullFilterTest(){
         Iterable<Book> books = target.clearQuery()
 //                .filterByPrice(500,700)
-                .filterByGenres(asList(Genre.ADVENTURE, Genre.FANTASY))//TODO make this work
+                .filterByGenres(asList(Genre.ADVENTURE, Genre.FANTASY))
 //                .sortByPrice()
                 .getResults(0);
         books.forEach(System.out::println);

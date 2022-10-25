@@ -74,7 +74,9 @@
                                 Learn more
                             </button>
                         </a>
-                        <button type="button" class="btn btn-dark flex-fill ms-1" th:attr="onclick=|addProductToCart('${book.isbn}')|">To cart</button>
+                        <button type="button" class="btn btn-dark flex-fill ms-1"
+                                th:attr="onclick=|addProductToCart('${book.isbn}')|">To cart
+                        </button>
                     </div>
                 </div>
             </div>
@@ -93,44 +95,56 @@
             <p class="lead fw-normal mb-2" th:text="${invoice.status}"></p>
         </div>
         <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-            <a th:href="@{'/cart/by-id?id='+${invoice.id}}"><button type="button" class="btn btn-info">Learn more</button></a>
+            <button
+                    th:attr="onclick=|get_inv_by_id('${invoice.id}')|"
+                    type="button" class="btn btn-info">Learn more
+            </button>
         </div>
     </div>
 </div>
 
-    <div class="card-body p-4" th:fragment="card_cart">
-        <div class="row d-flex align-items-center">
-            <div class="col-md-2 col-lg-2 col-xl-2">
-                <img th:src="@{${(book.book.cover != null && !#strings.isEmpty(book.book.cover)) ? '/covers/' + book.book.cover : '/covers/no_cover.png'}}"
-                        class="img-fluid rounded-3" alt="Cotton T-shirt">
-            </div>
-            <div class="col-md-3 col-lg-3 col-xl-3">
-                <p class="lead fw-normal mb-2" th:text="${book.book.name}"></p>
-                <p><span class="text-muted" th:text="'Authors: ' + ${#strings.arrayJoin(book.book.author,',')}"> </span> <span class="text-muted" th:text="${book.book.isbn}"> </span></p>
-            </div>
-            <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
-                <button class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                    <i class="fas fa-minus"></i>
-                </button>
+<div class="card-body p-4" th:fragment="card_cart">
+    <div class="row d-flex align-items-center">
+        <div class="col-md-2 col-lg-2 col-xl-2">
+            <img th:src="@{${(book.book.cover != null && !#strings.isEmpty(book.book.cover)) ? '/covers/' + book.book.cover : '/covers/no_cover.png'}}"
+                 class="img-fluid rounded-3" alt="Cotton T-shirt">
+        </div>
+        <div class="col-md-3 col-lg-3 col-xl-3">
+            <p class="lead fw-normal mb-2" th:text="${book.book.name}"></p>
+            <p><span class="text-muted" th:text="'Authors: ' + ${#strings.arrayJoin(book.book.author,',')}"> </span>
+                <span class="text-muted" th:text="${book.book.isbn}"> </span></p>
+        </div>
+        <div th:if="${#strings.toString(book.bookType) == 'PAPER'}" class="col-md-3 col-lg-3 col-xl-2 d-flex">
+            <button class="btn btn-link px-2"
+                    onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                <i class="fas fa-minus"></i>
+            </button>
 
-                <input th:id="${book.book.isbn}+'input'" min="1" name="quantity" th:value="${book.quantity}" type="number"
-                       class="form-control form-control-sm" th:attr="onchange=|on_change(${book.book.price},'${book.book.isbn}')|"/>
+            <input th:id="${book.book.isbn}+'input'" min="1" name="quantity" th:value="${book.quantity}" type="number"
+                   class="form-control form-control-sm"
+                   th:attr="onchange=|on_change(${book.book.price},'${book.book.isbn}')|"/>
 
-                <button class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                <h5 class="mb-0" th:id="${book.book.isbn}+'price'" th:text="${book.book.price} * ${book.quantity}"></h5>
-            </div>
-            <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                <a th:attr="onclick=|delete_book('${book.book.isbn}')|" class="text-danger"><button type="button" class="btn btn-danger">Delete</button></a>
-            </div>
-<!--            delete_book(isbn)-->
+            <button class="btn btn-link px-2"
+                    onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+        <div th:unless="${#strings.toString(book.bookType) == 'PAPER'}" class="col-md-3 col-lg-3 col-xl-2 d-flex">
+            <p class="lead fw-normal mb-2" th:text="${book.bookType}"></p>
+        </div>
+        <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+            <h5 class="mb-0" th:id="${book.book.isbn}+'price'" th:text="${book.book.price} * ${book.quantity}"></h5>
+        </div>
+        <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+            <a th:if="${#strings.toString(book.bookType) == 'PAPER'}" th:attr="onclick=|delete_book('${book.book.isbn}')|" class="text-danger">
+                <button type="button" class="btn btn-danger">Delete</button>
+            </a>
+            <a th:unless="${#strings.toString(book.bookType) == 'PAPER'}" th:attr="onclick=|delete_electronic('${book.book.isbn}')|" class="text-danger">
+                <button type="button" class="btn btn-danger">Delete</button>
+            </a>
         </div>
     </div>
+</div>
 
 <div class="container" th:fragment="big_card">
     <br>
@@ -140,13 +154,14 @@
                 <article class="gallery-wrap">
                     <div class="img-big-wrap">
                         <div th:if="${book.cover != null}">
-                            <img th:src="@{|/covers/${book.cover}|}" style="max-width:100%;max-height:100%" alt="non-nulll"/>
+                            <img th:src="@{${(book.cover != null && !#strings.isEmpty(book.cover)) ? '/covers/' + book.cover : '/covers/no_cover.png'}}"
+                                 style="max-width:100%;max-height:100%" alt="non-nulll"/>
                         </div>
                         <div th:unless="${book.cover != null}">
                             <img src="/covers/no_cover.png" style="max-width:100%;max-height:100%" alt="nulll"/>
                         </div>
-                    </div> <!-- slider-product.// -->
-                </article> <!-- gallery-wrap .end// -->
+                    </div>
+                </article>
             </aside>
             <aside class="col-sm-7">
                 <article class="card-body p-5">
@@ -155,10 +170,10 @@
                     </h3>
 
                     <p class="price-detail-wrap">
-	<span class="price h3 text-warning">
-		<span class="currency">Price: </span>
-        <span class="num" th:text="${book.price}"></span>
-	</span>
+	                    <span class="price h3 text-warning">
+		                <span class="currency">Price: </span>
+                        <span class="num" th:text="${book.price}"></span>
+	                    </span>
                     </p> <!-- price-detail-wrap .// -->
                     <dl class="item-property">
                         <dt>Description</dt>
@@ -191,30 +206,32 @@
                                 <dt>Version:</dt>
                                 <dd>
                                     <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio1" value="option2">
+                                        <input class="form-check-input" type="radio" name="version"
+                                               id="inlineRadio1" value="PAPER" checked>
                                         <span class="form-check-label">Paper version</span>
                                     </label>
                                     <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio2" value="option2">
+                                        <input class="form-check-input" type="radio" name="version"
+                                               id="inlineRadio2" value="ELECTRONIC">
                                         <span class="form-check-label">Electronic version</span>
                                     </label>
                                 </dd>
-                            </dl>  <!-- item-property .// -->
-                        </div> <!-- col.// -->
-                    </div> <!-- row.// -->
+                            </dl>
+                        </div>
+                    </div>
                     <hr>
-                    <a href="#" id="fav-a"><button id="fav-btn" name="fav-btn" class="btn btn-lg btn-dark text-uppercase">to favourite</button></a>
-                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase" th:attr="onclick=|addProductToCart('${book.isbn}')|"
-                       >to cart</a>
+                    <a href="#" id="fav-a">
+                        <button id="fav-btn" name="fav-btn" class="btn btn-lg btn-dark text-uppercase">to favourite
+                        </button>
+                    </a>
+                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase"
+                       th:attr="onclick=|addElectronicVersionToCart('${book.isbn}')|">to cart</a>
                     <a th:href="@{/book/edit(isbn=${book.isbn})}"
                        class="btn btn-lg btn-warning text-uppercase">update</a>
-                </article> <!-- card-body.// -->
-            </aside> <!-- col.// -->
-        </div> <!-- row.// -->
-    </div> <!-- card.// -->
-
+                </article>
+            </aside>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"

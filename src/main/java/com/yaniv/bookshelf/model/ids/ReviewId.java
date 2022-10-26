@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.OneToOne;
 import java.io.Serializable;
 
@@ -15,10 +16,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewId implements Serializable {
-    @OneToOne
-    private Book book;
-    @OneToOne
-    private Visitor visitor;
+    @Column(name = "book_isbn")
+    private String book;
+
+    @Column(name = "visitor_id")
+    private String visitor;
 
     @Override
     public boolean equals(Object o) {

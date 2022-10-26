@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>Your page</title>
@@ -50,6 +51,16 @@
                     <li>
                         <a id="available" href="#" class="nav-link text-white">
                             Available for download
+                        </a>
+                    </li>
+                    <li sec:authorize="hasAuthority('author:write')">
+                        <a id="authors" href="/author" class="nav-link text-white">
+                            Authors
+                        </a>
+                    </li>
+                    <li sec:authorize="hasAuthority('book:write')">
+                        <a id="new_book" href="/book/create" class="nav-link text-white">
+                            Create book
                         </a>
                     </li>
                 </ul>

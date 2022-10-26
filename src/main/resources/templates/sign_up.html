@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign-up</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<header th:replace="fragment/header :: header"></header>
+<div class="w3-sidebar w3-bar-block" style="width:100%">
+    <div class="container">
+        <form class="row g-3 needs-validation" method="post" target="_blank" novalidate>
+            <div class="col-md-4">
+                <label for="email" class="form-label">Email</label>
+                <input type="text" class="form-control" id="email" required>
+                <div class="invalid-feedback">
+                    Please add email
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="password" class="form-label">Password</label>
+                <input type="text" class="form-control" id="password" required>
+                <div class="invalid-feedback">
+                    Please add password
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="userName" class="form-label">Username</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text" id="inputGroupPrepend">@</span>
+                    <input type="text" class="form-control" id="userName" aria-describedby="inputGroupPrepend">
+                </div>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-warning" type="submit">Submit form</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script src="script/sign_up.js"></script>
+</body>
+</html>

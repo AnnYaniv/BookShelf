@@ -24,6 +24,14 @@ public class BookService {
         this.bookFilter = bookFilter;
     }
 
+    public Optional<Book> findByUserIdAndIsbn(String userId, String isbn){
+        return bookRepository.findByUserIdAndIsbn(userId, isbn);
+    }
+
+    public boolean isBookBought(String userId, String isbn){
+        return bookRepository.findByUserIdAndIsbn(userId, isbn).isPresent();
+    }
+
     public Iterable<Book> getAll(int page){
         return bookRepository.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
     }
@@ -60,5 +68,9 @@ public class BookService {
             case POPULARITY -> filter.sortByPopularity();
         }
         return filter.getResults(filterDto.getPage());
+    }
+
+    public double getAvgByBook(String isbn){
+        return Math.round(bookRepository.getAvgByBook(isbn));
     }
 }

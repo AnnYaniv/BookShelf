@@ -22,7 +22,9 @@
                 <a href="/auth/login">
                     <button type="button" class="btn btn-outline-light me-2">Login</button>
                 </a>
-                <button type="button" class="btn btn-warning">Sign-up</button>
+                <a href="/auth">
+                    <button type="button" class="btn btn-warning">Sign-up</button>
+                </a>
             </div>
             <div class="text-end" sec:authorize="isAuthenticated()">
                 <form sec:authorize="isAuthenticated()" action="/auth/logout" method="POST">

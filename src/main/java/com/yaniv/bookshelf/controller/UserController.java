@@ -7,7 +7,6 @@ import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -24,12 +23,6 @@ public class UserController {
         this.visitorService = visitorService;
     }
 
-    @PostMapping
-    public Visitor createUser(@RequestBody Visitor visitor){
-        LOGGER.info("data - {}",visitor);
-        return visitorService.createUser(visitor);
-    }
-
     @GetMapping
     public ModelAndView getInfo() {
         return new ModelAndView("user");
@@ -37,6 +30,7 @@ public class UserController {
 
     @GetMapping("/about")
     public ModelAndView getInfoById(Principal principal) {
+        LOGGER.info("Role: {}", visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getRole());
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         ModelAndView model = new ModelAndView("fragment/user_update");
         model.addObject("visitor", visitor);

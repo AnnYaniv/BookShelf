@@ -1,6 +1,7 @@
 package com.yaniv.bookshelf.controller;
 
 import com.yaniv.bookshelf.dto.BookDto;
+import com.yaniv.bookshelf.dto.BookReviewDto;
 import com.yaniv.bookshelf.dto.FilterDto;
 import com.yaniv.bookshelf.mapper.BookMapper;
 import com.yaniv.bookshelf.model.Author;
@@ -15,14 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 @RestController
@@ -46,13 +46,24 @@ public class BookController {
         if (optionalBook.isEmpty()) {
             return new ModelAndView("forward:/");
         } else {
+            Book book = optionalBook.get();
+            book.incrementVisited();
+            bookService.save(book);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Optional<Visitor> visitor = visitorService.findByEmail(authentication.getName());
             ModelAndView modelAndView = new ModelAndView("book_detail");
-            modelAndView.addObject("book", optionalBook.get());
+            modelAndView.addObject("book", book);
+            if(visitor.isPresent()) {
+                modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));
+            } else {
+                modelAndView.addObject("isReview", false);
+            }
             return modelAndView;
         }
     }
 
     @GetMapping("/edit")
+    @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView editBook(@RequestParam String isbn) {
         Optional<Book> optionalBook = bookService.findById(isbn);
         if (optionalBook.isEmpty()) {
@@ -71,6 +82,7 @@ public class BookController {
     }
 
     @GetMapping("/create")
+    @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView createBook() {
         ModelAndView modelAndView = new ModelAndView("book_edit");
         modelAndView.addObject("bookdto", BookMapper.toDto(new Book()));
@@ -113,6 +125,8 @@ public class BookController {
         if ((books.size() == 0) && (page != 0)) {
             page--;
         }
+        List<BookReviewDto> bookReview = new ArrayList<>();
+        
         model.addObject("books", bookService.findByNameLike(name, page));
         model.addObject("page", page);
         return model;

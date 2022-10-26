@@ -169,12 +169,15 @@ public class InvoiceController {
         inv.setBuyer(visitor);
 
         invoiceService.save(inv);
+
+        Map<String, Integer> emptyMap = new HashMap<>();
+        Set<String> emptySet = new HashSet<>();
         ResponseCookie cookie = ResponseCookie.from("invoice",
-                        URLEncoder.encode(cartMapper.toJson(new HashMap<>())))
-                .path("/cart").maxAge(0).build();
+                        URLEncoder.encode(cartMapper.toJson(emptyMap)))
+                .path("/cart").build();
         ResponseCookie cookieElectronic = ResponseCookie.from("elversion",
-                        URLEncoder.encode(cartMapper.setToJson(new HashSet<>())))
-                .path("/cart").maxAge(0).build();
+                        URLEncoder.encode(cartMapper.setToJson(emptySet)))
+                .path("/cart").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString())
                 .build();

@@ -4,7 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 public enum Permission implements GrantedAuthority {
     BOOK_READ("book:read"), BOOK_WRITE("book:write"),
-    AUTHOR_READ("author:read"), AUTHOR_WRITE("author:write");
+    AUTHOR_READ("author:read"), AUTHOR_WRITE("author:write"),
+    INVOICE_WRITE("invoice:write");
     private final String permission;
 
     Permission(String permission) {

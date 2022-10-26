@@ -24,6 +24,11 @@ public class ReviewService {
     }
 
     public double getAvgByBook(String isbn){
-        return Math.round(reviewRepository.getAvgByBook(isbn));
+        double result = 0;
+        Double review = reviewRepository.getAvgByBook(isbn);
+        if (review != null){
+            result = review;
+        }
+        return Math.round(result);
     }
 }

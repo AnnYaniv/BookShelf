@@ -6,6 +6,7 @@
     <title>Title</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/1c103036b2.js" crossorigin="anonymous"></script>
 
 </head>
 <body>
@@ -20,12 +21,30 @@
                     <h6 class="text-primary mb-1 pb-3" th:text="${'Price: '+ book.price }">
                     </h6>
                 </div>
+                <div class="text-center mt-1">
 
+                    <a th:if="${book.mark > 0}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
+                    <a th:unless="${book.mark > 0}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+
+                    <a th:if="${book.mark > 1}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
+                    <a th:unless="${book.mark > 1}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+
+                    <a th:if="${book.mark > 2}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
+                    <a th:unless="${book.mark > 2}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+
+                    <a th:if="${book.mark > 3}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
+                    <a th:unless="${book.mark > 3}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+
+                    <a th:if="${book.mark > 4}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
+                    <a th:unless="${book.mark > 4}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+                </div>
+                <br>
                 <div class="text-center">
                     <div  class="p-3 mx-n3 mb-4" style="background-color: #eff1f2;">
                         <h5 th:if="${#lists.isEmpty(book.author)}" class="mb-0">none</h5>
                         <h5 th:unless="${#lists.isEmpty(book.author)}" class="mb-0" th:text="${#strings.listJoin(book.author, ', ')}"></h5>
                     </div>
+
                     <div class="d-flex flex-row justify-content-center">
                         <p class="small mr-auto p-2" th:each="genre_ : ${book.genre}">
                             <a href="#" class="text-muted" th:text="${genre_}">Genres</a>
@@ -50,7 +69,8 @@
 
 <div class="card-body p-4" th:fragment="card_invoice">
     <div class="row d-flex align-items-center">
-        <div class="col-md-2 col-lg-2 col-xl-2">
+        <div class="col-md-4 col-lg-4 col-xl-4">
+            <p class="lead fw-normal mb-2" th:text="${invoice.buyer.email}"></p>
         </div>
         <div class="col-md-3 col-lg-3 col-xl-3">
             <p class="lead fw-normal mb-2" th:text="${#temporals.format(invoice.orderedAt, 'dd-MM-yyyy HH:mm')}"></p>

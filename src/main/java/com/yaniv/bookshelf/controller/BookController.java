@@ -4,6 +4,7 @@ import com.yaniv.bookshelf.dto.BookDto;
 import com.yaniv.bookshelf.dto.BookReviewDto;
 import com.yaniv.bookshelf.dto.FilterDto;
 import com.yaniv.bookshelf.mapper.BookMapper;
+import com.yaniv.bookshelf.mapper.BookReviewMapper;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.Visitor;
@@ -53,7 +54,7 @@ public class BookController {
             Optional<Visitor> visitor = visitorService.findByEmail(authentication.getName());
             ModelAndView modelAndView = new ModelAndView("book_detail");
             modelAndView.addObject("book", book);
-            if(visitor.isPresent()) {
+            if (visitor.isPresent()) {
                 modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));
             } else {
                 modelAndView.addObject("isReview", false);
@@ -126,8 +127,11 @@ public class BookController {
             page--;
         }
         List<BookReviewDto> bookReview = new ArrayList<>();
-        
-        model.addObject("books", bookService.findByNameLike(name, page));
+        bookService.findByNameLike(name, page).forEach(book ->
+                bookReview.add(
+                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                        )));
+        model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;
     }
@@ -139,9 +143,13 @@ public class BookController {
         if ((books.size() == 0) && (filterDto.getPage() != 0)) {
             filterDto.setPage(filterDto.getPage() - 1);
         }
-        books.forEach(book -> LOGGER.info("Book {}", book));
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        model.addObject("books", bookService.filterBook(filterDto));
+        List<BookReviewDto> bookReview = new ArrayList<>();
+        bookService.filterBook(filterDto).forEach(book ->
+                bookReview.add(
+                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                        )));
+        model.addObject("books", bookReview);
         model.addObject("page", filterDto.getPage());
         return model;
     }
@@ -156,7 +164,13 @@ public class BookController {
             books = StreamSupport.stream(bookService.findByUser(visitor.getId(), page).spliterator(), false).toList();
         }
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        model.addObject("books", books);
+
+        List<BookReviewDto> bookReview = new ArrayList<>();
+        books.forEach(book ->
+                bookReview.add(
+                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                        )));
+        model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;
     }
@@ -171,7 +185,12 @@ public class BookController {
             books = StreamSupport.stream(bookService.findByUserElectronic(visitor.getId(), page).spliterator(), false).toList();
         }
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        model.addObject("books", books);
+        List<BookReviewDto> bookReview = new ArrayList<>();
+        books.forEach(book ->
+                bookReview.add(
+                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                        )));
+        model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;
     }

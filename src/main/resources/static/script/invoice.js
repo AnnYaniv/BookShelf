@@ -1,7 +1,7 @@
 function cart_return() {
     $.ajax({
         type: "GET",
-        url: "/cart/all",
+        url: "/cart/all?page=0",
         success: function (data, textStatus, jQxhr) {
             console.log("we get about");
             $('#data-container').html(data);

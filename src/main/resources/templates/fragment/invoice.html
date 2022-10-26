@@ -21,9 +21,19 @@
             <div class="col col-2"></div>
             <div class="col col-3"></div>
             <div class="col col-4"></div>
-            <div class="col-5">
+            <div class="col col-5">
                 <button type="button" id="return-cart" onclick="cart_return()" class="btn btn-info" style="font-size: 16px">Return</button>
             </div>
+        </li>
+        <li sec:authorize="hasAuthority('invoice:write')">
+            <div class="col col-1"></div>
+            <div class="col col-2"></div>
+            <div class="col col-3"><button type="button" th:attr="onclick=|cart_status('DECLINED','${inv}')|"
+                                           class="btn btn-outline-danger">DECLINE</button></div>
+            <div class="col col-4"><button type="button" th:attr="onclick=|cart_status('SHIPMENT','${inv}')|"
+                                           class="btn btn-warning">SHIPMENT</button></div>
+            <div class="col col-5"><button type="button" th:attr="onclick=|cart_status('COMPLETED','${inv}')|"
+                                           class="btn btn-secondary">COMPLETED</button></div>
         </li>
     </ul>
 </div>

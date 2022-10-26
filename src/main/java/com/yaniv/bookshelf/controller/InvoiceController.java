@@ -6,8 +6,10 @@ import com.yaniv.bookshelf.model.Invoice;
 import com.yaniv.bookshelf.model.OrderedBook;
 import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.model.enums.BookType;
+import com.yaniv.bookshelf.model.enums.OrderStatus;
 import com.yaniv.bookshelf.service.BookService;
 import com.yaniv.bookshelf.service.InvoiceService;
+import com.yaniv.bookshelf.service.StatusValidator;
 import com.yaniv.bookshelf.service.VisitorService;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/cart")
@@ -207,11 +210,33 @@ public class InvoiceController {
     }
 
     @GetMapping("/all")
-    public ModelAndView all(Principal principal) {
-        List<Invoice> invoices = invoiceService.getAllByEmail(principal.getName());
+    public ModelAndView all(Principal principal, @RequestParam int page) {
+        Iterable<Invoice> invoices = invoiceService.getAllByEmail(principal.getName(), page);
+        List<Invoice> invoicesList = StreamSupport.stream(invoices.spliterator(), false).toList();
+        if ((invoicesList.size() == 0) && (page != 0)) {
+            page--;
+            invoicesList = StreamSupport.stream(invoiceService.getAllByEmail(principal.getName(), page).spliterator(), false).toList();
+        }
         ModelAndView model = new ModelAndView("fragment/all_invoices");
-        model.addObject("invoices", invoices);
+        model.addObject("invoices", invoicesList);
+        model.addObject("page", page);
         return model;
+    }
+    
+    @GetMapping("/manage")
+    public ModelAndView manage(@RequestParam int page, @RequestParam OrderStatus status) {
+        Iterable<Invoice> invoices = invoiceService.getAllByStatus(status, page);
+        List<Invoice> invoicesList = StreamSupport.stream(invoices.spliterator(), false).toList();
+        if ((invoicesList.size() == 0) && (page != 0)) {
+            page--;
+            invoicesList = StreamSupport.stream(invoiceService.getAllByStatus(status, page).spliterator(), false).toList();
+        }
+        LOGGER.info("manage sort: {}", status);
+        ModelAndView modelAndView = new ModelAndView("fragment/filter_invoice");
+        modelAndView.addObject("invoices", invoicesList);
+        modelAndView.addObject("cur_status", status);
+        modelAndView.addObject("page", page);
+        return modelAndView;
     }
 
     @GetMapping("/by-id")
@@ -220,8 +245,17 @@ public class InvoiceController {
         Invoice invoice = optionalInvoice.orElse(new Invoice());
         ModelAndView modelAndView = new ModelAndView("fragment/invoice");
         modelAndView.addObject("books", invoice.getBooksInOrder());
+        modelAndView.addObject("inv", id);
         modelAndView.addObject("total", invoice.getBooksInOrder().stream()
                 .mapToDouble(orderedBook -> orderedBook.getPrice() * orderedBook.getQuantity()).sum());
         return modelAndView;
+    }
+
+    @PutMapping("/manage")
+    public ModelAndView updateInvoice(@RequestParam String id, @RequestParam OrderStatus status) {
+        LOGGER.info("status put: {}",status);
+        Invoice invoice = invoiceService.findById(id).orElse(new Invoice());
+        invoiceService.save(StatusValidator.validateStatus(invoice, status, bookService));
+        return getById(id);
     }
 }

@@ -63,6 +63,11 @@
                             Create book
                         </a>
                     </li>
+                    <li sec:authorize="hasAuthority('book:write')">
+                        <a id="orders" href="/book/create" class="nav-link text-white">
+                            Manage orders
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div id="data-container" class="col p-0" style="background-color: #eee;">

@@ -36,7 +36,7 @@ class ReviewServiceTest {
         Book book = bookService.findById("isbn-5").orElse(new Book());
         Visitor visitor = visitorService.findById("adm1").orElse(new Visitor());
 
-        Review review = new Review(book, visitor, 5, "good book", LocalDateTime.now());
-        target.save(review);
+        //Review review = new Review(book, visitor, 5, "good book", LocalDateTime.now());
+        //target.save(review);
     }
 }

@@ -24,6 +24,9 @@ public class Review {
     @Id @Column(name = "visitor_id")
     private String visitor;
 
+//    @ManyToOne
+//    private Book bookEntity;
+
     @Max(5)
     @Min(0)
     @Column(nullable = false)

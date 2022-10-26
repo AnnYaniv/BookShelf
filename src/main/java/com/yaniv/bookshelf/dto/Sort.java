@@ -1,5 +1,5 @@
 package com.yaniv.bookshelf.dto;
 
 public enum Sort {
-    POPULARITY,MARK,PRICE
+    POPULARITY,PRICE, POPULARITY_DESC, PRICE_DESC
 }

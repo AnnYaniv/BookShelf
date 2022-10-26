@@ -32,6 +32,9 @@ public class Book implements Serializable {
     )
     private Set<Author> author = new java.util.LinkedHashSet<>();
 
+//    @OneToMany
+//    private Set<Review> reviews;
+
     @Type(type="text")
     private String annotation;
     @ElementCollection(targetClass = Genre.class)

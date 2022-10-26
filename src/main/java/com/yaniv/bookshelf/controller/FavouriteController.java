@@ -1,5 +1,7 @@
 package com.yaniv.bookshelf.controller;
 
+import com.yaniv.bookshelf.dto.BookReviewDto;
+import com.yaniv.bookshelf.mapper.BookReviewMapper;
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.Favourite;
 import com.yaniv.bookshelf.model.Visitor;
@@ -18,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -47,7 +47,12 @@ public class FavouriteController {
             String favouriteId = favouriteService.getFavourite(visitorOptional.get()).getId();
             Iterable<Book> books = favouriteService.getBooks(0, favouriteId);
             ModelAndView modelAndView = new ModelAndView("favourite");
-            modelAndView.addObject("books", books);
+            List<BookReviewDto> bookReview = new ArrayList<>();
+            books.forEach(book ->
+                    bookReview.add(
+                            BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                            )));
+            modelAndView.addObject("books", bookReview);
             modelAndView.addObject("page",0);
             return modelAndView;
         }
@@ -69,7 +74,12 @@ public class FavouriteController {
             }
             books.forEach(book -> LOGGER.info("Book {}", book));
             ModelAndView modelAndView = new ModelAndView("fragment/book_selection");
-            modelAndView.addObject("books", books);
+            List<BookReviewDto> bookReview = new ArrayList<>();
+            books.forEach(book ->
+                    bookReview.add(
+                            BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
+                            )));
+            modelAndView.addObject("books", bookReview);
             modelAndView.addObject("page",page);
             return modelAndView;
         }

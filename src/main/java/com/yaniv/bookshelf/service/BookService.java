@@ -60,17 +60,30 @@ public class BookService {
         if((filterDto.getGenre()!=null)&&(!filterDto.getGenre().isEmpty())){
             filter.filterByGenres(filterDto.getGenre());
         }
-        if ((filterDto.getMin()!= null)&&(filterDto.getMax()!=null)){
-            filter.filterByPrice(filterDto.getMin(), filterDto.getMax());
+        double min = 0, max = Double.MAX_VALUE;
+        if (filterDto.getMin() != null){
+            min = filterDto.getMin();
         }
+        if (filterDto.getMax() != null){
+            max = filterDto.getMax();
+        }
+        filter.filterByPrice(min, max);
+
         switch (filterDto.getSort()) {
             case PRICE -> filter.sortByPrice();
             case POPULARITY -> filter.sortByPopularity();
+            case PRICE_DESC -> filter.sortByPriceDesc();
+            case POPULARITY_DESC -> filter.sortByPopularityDesc();
         }
         return filter.getResults(filterDto.getPage());
     }
 
     public double getAvgByBook(String isbn){
-        return Math.round(bookRepository.getAvgByBook(isbn));
+        double result = 0;
+        Double review = bookRepository.getAvgByBook(isbn);
+        if (review != null){
+            result = review;
+        }
+        return Math.round(result);
     }
 }

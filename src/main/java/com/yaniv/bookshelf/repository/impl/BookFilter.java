@@ -1,6 +1,7 @@
 package com.yaniv.bookshelf.repository.impl;
 
 import com.yaniv.bookshelf.model.Book;
+import com.yaniv.bookshelf.model.Review;
 import com.yaniv.bookshelf.model.enums.Genre;
 import com.yaniv.bookshelf.repository.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,16 @@ public class BookFilter implements Filter<Book> {
 
     public BookFilter sortByPopularity(){
         bookCriteria.orderBy(criteriaBuilder.asc(bookRoot.get("visited")));
+        return this;
+    }
+
+    public BookFilter sortByPriceDesc(){
+        bookCriteria.orderBy(criteriaBuilder.desc(bookRoot.get("price")));
+        return this;
+    }
+
+    public BookFilter sortByPopularityDesc(){
+        bookCriteria.orderBy(criteriaBuilder.desc(bookRoot.get("visited")));
         return this;
     }
 

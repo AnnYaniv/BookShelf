@@ -13,15 +13,26 @@ import com.yaniv.bookshelf.service.AuthorService;
 import com.yaniv.bookshelf.service.BookService;
 import com.yaniv.bookshelf.service.VisitorService;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -99,21 +110,19 @@ public class BookController {
     @SneakyThrows
     @PostMapping("/edit")
     @PreAuthorize("hasAuthority('book:write')")
-    public String updateBook(@ModelAttribute BookDto bookdto) {
+    public ModelAndView updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
-        bookService.save(book);
-        return bookdto + "<br>" +
-                book + "<br>";
+       bookService.save(book);
+        return editBook(book.getIsbn());
     }
 
     @SneakyThrows
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('book:write')")
-    public String createBook(@ModelAttribute BookDto bookdto) {
+    public ModelAndView createBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
         bookService.save(book);
-        return bookdto + "<br>" +
-                book + "<br>";
+        return editBook(book.getIsbn());
     }
 
     @GetMapping("/filter")
@@ -193,5 +202,26 @@ public class BookController {
         model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<Object> downloadFile(@RequestParam String isbn) throws FileNotFoundException {
+        String filename = Thread.currentThread().getContextClassLoader()
+                .getResource("static/book/" + bookService.findById(isbn).orElse(new Book()).getBookUrl()).getPath();
+
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition",
+                String.format("attachment; filename=\"%s\"", file.getName()));
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/txt")).body(resource);
+
+        return responseEntity;
     }
 }

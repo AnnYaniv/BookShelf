@@ -222,7 +222,7 @@ public class InvoiceController {
         model.addObject("page", page);
         return model;
     }
-    
+
     @GetMapping("/manage")
     public ModelAndView manage(@RequestParam int page, @RequestParam OrderStatus status) {
         Iterable<Invoice> invoices = invoiceService.getAllByStatus(status, page);

@@ -97,9 +97,14 @@ public class FavouriteController {
                 visitorService.findByEmail(name).orElseGet(() -> null)));
         if (optionalBook.isPresent()) {
             Book book = optionalBook.get();
-            favourite.addBook(book);
+            if(favourite.getBooks().contains(book)){
+                favourite.removeBook(book);
+                LOGGER.info("Removed - {}", book);
+            } else {
+                favourite.addBook(book);
+                LOGGER.info("Added - {}", book);
+            }
             favouriteService.save(favourite);
-            LOGGER.info("Added - {}", book);
         }
         LOGGER.info("Book - {}", optionalBook);
         return favourite.getBooks() + "<br>";

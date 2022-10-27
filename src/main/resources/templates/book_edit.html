@@ -105,7 +105,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="bookUrl" th:field="*{bookUrl}">
+                    <input type="file" class="custom-file-input" id="bookUrl" th:field="*{book}">
                     <label class="custom-file-label" for="custom_cover">Choose a book</label>
                 </div>
             </div>
@@ -119,6 +119,8 @@
             <div class="col-md-4 mb-3">
                 <input type="text" class="form-control invisible" th:value="*{coverUrl}" th:field="*{coverUrl}"
                        id="coverUrl"/>
+                <input type="text" class="form-control invisible" th:value="*{bookUrl}" th:field="*{bookUrl}"
+                       id="bookUrl"/>
                 <input type="text" class="form-control invisible" th:value="*{visited}" th:field="*{visited}"
                        id="visited"/>
             </div>

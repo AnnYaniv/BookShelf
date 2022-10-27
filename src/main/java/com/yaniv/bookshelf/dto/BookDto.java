@@ -19,8 +19,10 @@ public class BookDto {
     double price;
     Integer visited;
     MultipartFile cover;
+    MultipartFile book;
     String coverUrl;
-    MultipartFile bookUrl;
+    String bookUrl;
+
     List<String> authorsIds ;
     Set<Genre> genre;
 

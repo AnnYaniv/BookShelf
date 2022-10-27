@@ -6,11 +6,15 @@ import com.yaniv.bookshelf.model.Book;
 import lombok.SneakyThrows;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -26,28 +30,20 @@ public class BookMapper {
         book.setAnnotation(dto.getAnnotation());
         book.setPublishingHouse(dto.getPublishingHouse());
         book.setYear(dto.getYear());
-
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         MultipartFile cover = dto.getCover();
         if(!cover.isEmpty()) {
-            String contentType = switch (Objects.requireNonNull(cover.getContentType())) {
-                case "image/png" -> ".png";
-                case "image/jpeg" -> ".jpeg";
-                case "image/jpg" -> ".jpg";
-                default -> ".data";
-            };
-            String name = UUID.randomUUID() + contentType;
-
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            Files.copy(dto.getCover().getInputStream(),
-                    Paths.get("src", "main", "resources", "static", "covers").resolve(
-                            name));
-            Files.copy(dto.getCover().getInputStream(),
-                Path.of(Objects.requireNonNull(loader.getResource("static/covers")).toURI())
-                    .resolve(name));
-            book.setCover(name);
+            book.setCover(saveFile(cover,"covers" , loader));
         } else {
             book.setCover(dto.getCoverUrl());
         }
+        MultipartFile bookFile = dto.getBook();
+        if(!bookFile.isEmpty()) {
+            book.setBookUrl(saveFile(bookFile,"book" , loader));
+        } else {
+            book.setBookUrl(dto.getBookUrl());
+        }
+
         book.setAuthor(dto.getAuthorsIds().stream().map(authorId -> {
             Author author = new Author();
             author.setId(authorId);
@@ -58,12 +54,31 @@ public class BookMapper {
         return book;
     }
 
+    private static String saveFile(MultipartFile cover, String folder, ClassLoader loader) throws IOException, URISyntaxException {
+        String name = UUID.randomUUID() + getFileType(cover.getOriginalFilename());
+        Files.copy(cover.getInputStream(),
+                Paths.get("src", "main", "resources", "static", folder).resolve(
+                        name));
+        Files.copy(cover.getInputStream(),
+                Path.of(Objects.requireNonNull(loader.getResource("static/" + folder)).toURI())
+                        .resolve(name));
+        return name;
+    }
+
+    private static String getFileType(String filename){
+        StringBuilder sb = new StringBuilder(".");
+        Matcher matcher = Pattern.compile("[^\\\\]*\\.(\\w+)$").matcher(filename);
+        while (matcher.find()) {
+            sb.append(matcher.group(1));
+        }
+        return sb.toString();
+    }
 
     public static BookDto toDto(Book book) {
         return new BookDto(
                 book.getIsbn(), book.getName(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
-                null, book.getCover() ,null, book.getAuthor().stream().map(Author::getId).toList(),
+                null,null, book.getCover(),book.getBookUrl() , book.getAuthor().stream().map(Author::getId).toList(),
                 book.getGenre()
         );
     }

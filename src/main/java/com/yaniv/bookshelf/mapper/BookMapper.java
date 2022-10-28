@@ -4,6 +4,8 @@ import com.yaniv.bookshelf.dto.BookDto;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.model.Book;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 
 public class BookMapper {
-
+    public static final Logger LOGGER = LoggerFactory.getLogger(BookMapper.class);
     @SneakyThrows
     public static Book toBook(BookDto dto) {
         Book book = new Book();
@@ -56,9 +58,13 @@ public class BookMapper {
 
     private static String saveFile(MultipartFile cover, String folder, ClassLoader loader) throws IOException, URISyntaxException {
         String name = UUID.randomUUID() + getFileType(cover.getOriginalFilename());
-        Files.copy(cover.getInputStream(),
-                Paths.get("src", "main", "resources", "static", folder).resolve(
-                        name));
+        try {
+            Files.copy(cover.getInputStream(),
+                    Paths.get("src", "main", "resources", "static", folder).resolve(
+                            name));
+        } catch (Exception e) {
+            LOGGER.warn("You not debug mode; src folder not exist");
+        }
         Files.copy(cover.getInputStream(),
                 Path.of(Objects.requireNonNull(loader.getResource("static/" + folder)).toURI())
                         .resolve(name));

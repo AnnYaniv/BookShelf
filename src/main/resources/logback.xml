@@ -1,0 +1,67 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{66} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <property name = "repo-file" value = "logs/repo"/>
+    <property name = "service-file" value = "logs/service"/>
+    <property name = "mapper-file" value = "logs/mapper"/>
+
+    <appender name="service-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${service-file}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${service-file}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="repo-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${repo-file}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${repo-file}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{HH:mm:ss}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="mapper-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${mapper-file}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${mapper-file}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="service-log" level="INFO" additivity="true">
+        <appender-ref ref="service-logger"/>
+    </logger>
+
+    <logger name="repo-log" level="INFO" additivity="true">
+        <appender-ref ref="repo-logger"/>
+    </logger>
+
+    <logger name="mapper-log" level="INFO" additivity="true">
+        <appender-ref ref="mapper-logger"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

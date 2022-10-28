@@ -4,6 +4,8 @@ import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.Review;
 import com.yaniv.bookshelf.model.enums.Genre;
 import com.yaniv.bookshelf.repository.Filter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Repository
 public class BookFilter implements Filter<Book> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("repo-log");
     private static final int PAGE_SIZE = 9;
     private final EntityManager entityManager;
     private CriteriaBuilder criteriaBuilder;

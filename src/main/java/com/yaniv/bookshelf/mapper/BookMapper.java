@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 
 
 public class BookMapper {
-    public static final Logger LOGGER = LoggerFactory.getLogger(BookMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("mapper-log");
+
     @SneakyThrows
     public static Book toBook(BookDto dto) {
         Book book = new Book();

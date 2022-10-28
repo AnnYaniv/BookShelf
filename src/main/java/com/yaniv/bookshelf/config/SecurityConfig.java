@@ -47,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/styles/**").permitAll()
                 .antMatchers("/script/**").permitAll()
                 .antMatchers("/auth").permitAll()
+                .antMatchers("/cart").permitAll()
+                .antMatchers("/cart/delete").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -58,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout", "POST"))
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID", "invoice")
+                .deleteCookies("JSESSIONID", "invoice", "elversion")
                 .logoutSuccessUrl("/auth/login");
     }
 

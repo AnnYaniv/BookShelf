@@ -5,6 +5,8 @@ import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.repository.impl.BookFilter;
 import com.yaniv.bookshelf.repository.BookRepository;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +18,8 @@ import java.util.Optional;
 @Service
 @NoArgsConstructor
 public class BookService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
     private static final int ITEMS_PER_PAGE = 9;
     private BookRepository bookRepository;
     private BookFilter bookFilter;
@@ -43,6 +47,7 @@ public class BookService {
     }
 
     public Book save(Book book){
+        LOGGER.info("Save book {}",book);
         return bookRepository.save(book);
     }
 

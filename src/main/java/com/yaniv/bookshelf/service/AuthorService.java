@@ -2,6 +2,8 @@ package com.yaniv.bookshelf.service;
 
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.repository.AuthorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class AuthorService {
+    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
+
     private final AuthorRepository authorRepository;
 
     private static final int ITEMS_PER_PAGE = 12;
@@ -21,6 +25,7 @@ public class AuthorService {
     }
 
     public Author save(Author author) {
+        LOGGER.info("Saving author {}", author);
         return authorRepository.save(author);
     }
 

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class VisitorService {
     private final VisitorRepository visitorRepository;
-    private static final Logger LOGGER = LoggerFactory.getLogger(VisitorService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
 
     @Autowired
     public VisitorService(VisitorRepository visitorRepository){
@@ -21,6 +21,7 @@ public class VisitorService {
     }
 
     public Visitor save(Visitor visitor){
+        LOGGER.info("New user: {}", visitor);
         return visitorRepository.save(visitor);
     }
 

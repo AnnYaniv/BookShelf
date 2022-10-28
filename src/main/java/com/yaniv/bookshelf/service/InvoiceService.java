@@ -4,6 +4,8 @@ import com.yaniv.bookshelf.model.Invoice;
 import com.yaniv.bookshelf.model.enums.OrderStatus;
 import com.yaniv.bookshelf.repository.InvoiceRepository;
 import com.yaniv.bookshelf.repository.OrderedBookRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +16,7 @@ import java.util.Optional;
 
 @Service
 public class InvoiceService {
+    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
     private final InvoiceRepository invoiceRepository;
     private final OrderedBookRepository orderedBookRepository;
 
@@ -26,6 +29,7 @@ public class InvoiceService {
     }
 
     public void save(Invoice invoice) {
+        LOGGER.info("Saving invoice {}", invoice);
         orderedBookRepository.saveAll(invoice.getBooksInOrder());
         invoiceRepository.save(invoice);
     }

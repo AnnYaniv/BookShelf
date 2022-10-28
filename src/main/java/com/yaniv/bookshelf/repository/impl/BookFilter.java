@@ -5,6 +5,10 @@ import com.yaniv.bookshelf.model.Review;
 import com.yaniv.bookshelf.model.enums.Genre;
 import com.yaniv.bookshelf.repository.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -70,7 +74,7 @@ public class BookFilter implements Filter<Book> {
     }
 
     @Override
-    public Iterable<Book> getResults(int page) {
+    public List<Book> getResults(int page) {
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
         if(predicateArray.length > 0) {
             bookCriteria.where(predicateArray);

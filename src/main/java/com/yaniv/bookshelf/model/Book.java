@@ -1,17 +1,20 @@
 package com.yaniv.bookshelf.model;
 
 import com.yaniv.bookshelf.model.enums.Genre;
+import com.yaniv.bookshelf.service.BookValidator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 
 @Entity
 @Getter
@@ -32,9 +35,6 @@ public class Book implements Serializable {
     )
     private Set<Author> author = new java.util.LinkedHashSet<>();
 
-//    @OneToMany
-//    private Set<Review> reviews;
-
     @Type(type="text")
     private String annotation;
     @ElementCollection(targetClass = Genre.class)
@@ -45,23 +45,24 @@ public class Book implements Serializable {
     private int year;
     private String publishingHouse;
 
-//    @Column(columnDefinition = "0")
-//    @Min(0)
+    @Min(0)
     private int count;
 
-//    @Column(columnDefinition = "0")
-//    @Min(0)
+    @Min(0)
     private double price;
     private int visited;
 
     private String cover;
+
+    @NotBlank
     private String bookUrl;
 
     @PrePersist
     public void prePersist() {
-        if(genre.isEmpty()){
-            genre.add(Genre.NONE);
+        if((genre==null) || genre.isEmpty()){
+            genre = asSet(Genre.NONE);
         }
+        BookValidator.isValid(this);
     }
 
     public void incrementVisited(){

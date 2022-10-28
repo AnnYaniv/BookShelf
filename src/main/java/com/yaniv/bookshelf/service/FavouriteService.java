@@ -6,6 +6,7 @@ import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.repository.FavouriteRepository;
 import com.yaniv.bookshelf.repository.VisitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class FavouriteService {
         }
     }
 
-    public Iterable<Book> getBooks(int page, String id){
+    public Page<Book> getBooks(int page, String id){
         return favouriteRepository.getBooks(PageRequest.of(page, 9), id);
     }
 

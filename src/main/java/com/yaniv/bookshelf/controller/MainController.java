@@ -4,28 +4,22 @@ import com.yaniv.bookshelf.dto.BookReviewDto;
 import com.yaniv.bookshelf.dto.FilterDto;
 import com.yaniv.bookshelf.mapper.BookReviewMapper;
 import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.service.AuthorService;
 import com.yaniv.bookshelf.service.BookService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @RestController
 public class MainController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
     private final BookService bookService;
-    private final AuthorService authorService;
 
     @Autowired
-    public MainController(BookService bookService, AuthorService authorService) {
-        this.authorService = authorService;
+    public MainController(BookService bookService) {
         this.bookService = bookService;
     }
 
@@ -46,18 +40,11 @@ public class MainController {
 
     @GetMapping("/pageable")
     public ModelAndView getPage(int page){
-        ModelAndView modelAndView = new ModelAndView("fragment/book_selection");
-        List<Book> books = StreamSupport.stream(bookService.getAll(page).spliterator(), false).toList();
-        if(books.size() == 0){
-            page--;
+        Page<Book> bookPage = bookService.getAll(page);
+        if(bookPage.getTotalPages() < page){
+            page = bookPage.getTotalPages();
+            bookPage = bookService.getAll(page);
         }
-        List<BookReviewDto> bookReview = new ArrayList<>();
-        bookService.getAll(page).forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
-        modelAndView.addObject("books", bookReview);
-        modelAndView.addObject("page",page);
-        return modelAndView;
+        return BookController.bookSelectionModelCreator(bookPage, page, bookService);
     }
 }

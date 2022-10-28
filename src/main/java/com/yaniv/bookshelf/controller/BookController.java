@@ -17,8 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +27,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/book")
@@ -66,8 +63,10 @@ public class BookController {
             ModelAndView modelAndView = new ModelAndView("book_detail");
             modelAndView.addObject("book", book);
             if (visitor.isPresent()) {
+                modelAndView.addObject("isDownload", bookService.findElectronicByUserIdAndIsbn(visitor.get().getId(), isbn).isPresent());
                 modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));
             } else {
+                modelAndView.addObject("isDownload", false);
                 modelAndView.addObject("isReview", false);
             }
             return modelAndView;
@@ -85,10 +84,10 @@ public class BookController {
             LOGGER.info("book to edit - {}", optionalBook.get());
             modelAndView.addObject("bookdto", BookMapper.toDto(optionalBook.get()));
             modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
-            modelAndView.addObject("authors", authorService.getAll());
             Author author = new Author();
             author.setId(UUID.randomUUID().toString());
             modelAndView.addObject("author", author);
+            modelAndView.addObject("authors", authorService.getAllSorted());
             return modelAndView;
         }
     }
@@ -99,10 +98,10 @@ public class BookController {
         ModelAndView modelAndView = new ModelAndView("book_edit");
         modelAndView.addObject("bookdto", BookMapper.toDto(new Book()));
         modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
-        modelAndView.addObject("authors", authorService.getAll());
         Author author = new Author();
         author.setId(UUID.randomUUID().toString());
         modelAndView.addObject("author", author);
+        modelAndView.addObject("authors", authorService.getAllSorted());
         return modelAndView;
     }
 
@@ -112,15 +111,12 @@ public class BookController {
     @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
-       bookService.save(book);
-        return editBook(book.getIsbn());
-    }
-
-    @SneakyThrows
-    @PostMapping("/create")
-    @PreAuthorize("hasAuthority('book:write')")
-    public ModelAndView createBook(@ModelAttribute BookDto bookdto) {
-        Book book = BookMapper.toBook(bookdto);
+        if (bookdto.getBook().isEmpty() && StringUtils.isBlank(bookdto.getBookUrl())) {
+            LOGGER.info("Can't edit'");
+            ModelAndView infoModel = new ModelAndView("information");
+            infoModel.addObject("info", "Data not valid, check electronic book");
+            return infoModel;
+        }
         bookService.save(book);
         return editBook(book.getIsbn());
     }
@@ -131,83 +127,55 @@ public class BookController {
         LOGGER.info("Books-{}", bookService.findByNameLike(name, page));
         LOGGER.info("page-{}", page);
         ModelAndView model = new ModelAndView("fragment/book_selection");
-        List<Book> books = StreamSupport.stream(bookService.findByNameLike(name, page).spliterator(), false).toList();
-        if ((books.size() == 0) && (page != 0)) {
-            page--;
+        Page<Book> bookPage = bookService.findByNameLike(name, page);
+        if (bookPage.getTotalPages() - 1 < page) {
+            page = bookPage.getTotalPages() - 1;
+            bookPage = bookService.findByNameLike(name, page);
         }
-        List<BookReviewDto> bookReview = new ArrayList<>();
-        bookService.findByNameLike(name, page).forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
-        model.addObject("books", bookReview);
-        model.addObject("page", page);
-        return model;
+        return bookSelectionModelCreator(bookPage, page, bookService);
     }
 
     @GetMapping("/getFilterBy")
     public ModelAndView getFilterBy(@ModelAttribute FilterDto filterDto) {
         LOGGER.info("filter in getFilterBy: {}", filterDto);
-        List<Book> books = (List<Book>) bookService.filterBook(filterDto);
-        if ((books.size() == 0) && (filterDto.getPage() != 0)) {
-            filterDto.setPage(filterDto.getPage() - 1);
+        List<Book> books = bookService.filterBook(filterDto);
+        if (books.isEmpty()) {
+            filterDto.setPage(0);
+            books = bookService.filterBook(filterDto);
         }
-        ModelAndView model = new ModelAndView("fragment/book_selection");
-        List<BookReviewDto> bookReview = new ArrayList<>();
-        bookService.filterBook(filterDto).forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
-        model.addObject("books", bookReview);
-        model.addObject("page", filterDto.getPage());
-        return model;
+        return bookSelectionModelCreator(books, filterDto.getPage(), bookService);
     }
 
     @GetMapping("/get-by-user")
     public ModelAndView getBooksByUser(Principal principal, @RequestParam int page) {
         LOGGER.info("get-by-user {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
-        List<Book> books = StreamSupport.stream(bookService.findByUser(visitor.getId(), page).spliterator(), false).toList();
-        if ((books.size() == 0) && (page != 0)) {
-            page--;
-            books = StreamSupport.stream(bookService.findByUser(visitor.getId(), page).spliterator(), false).toList();
+        Page<Book> bookPage = bookService.findByUser(visitor.getId(), page);
+        if ((bookPage.getTotalPages() - 1 < page) && (bookPage.getTotalPages() != 0)) {
+            page = bookPage.getTotalPages() - 1;
+            bookPage = bookService.findByUser(visitor.getId(), page);
         }
-        ModelAndView model = new ModelAndView("fragment/book_selection");
-
-        List<BookReviewDto> bookReview = new ArrayList<>();
-        books.forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
-        model.addObject("books", bookReview);
-        model.addObject("page", page);
-        return model;
+        return bookSelectionModelCreator(bookPage, page, bookService);
     }
 
     @GetMapping("/get-by-user-electronic")
     public ModelAndView getBooksByUserElectronic(Principal principal, @RequestParam int page) {
         LOGGER.info("get-by-user-electronic {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
-        List<Book> books = StreamSupport.stream(bookService.findByUserElectronic(visitor.getId(), page).spliterator(), false).toList();
-        if ((books.size() == 0) && (page != 0)) {
-            page--;
-            books = StreamSupport.stream(bookService.findByUserElectronic(visitor.getId(), page).spliterator(), false).toList();
+        Page<Book> bookPage = bookService.findByUserElectronic(visitor.getId(), page);
+        if ((bookPage.getTotalPages() - 1 < page) && (bookPage.getTotalPages() != 0)) {
+            page = bookPage.getTotalPages() - 1;
+            bookPage = bookService.findByUserElectronic(visitor.getId(), page);
         }
-        ModelAndView model = new ModelAndView("fragment/book_selection");
-        List<BookReviewDto> bookReview = new ArrayList<>();
-        books.forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
-        model.addObject("books", bookReview);
-        model.addObject("page", page);
-        return model;
+        return bookSelectionModelCreator(bookPage, page, bookService);
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Object> downloadFile(@RequestParam String isbn) throws FileNotFoundException {
+    public ResponseEntity<Object> downloadFile(@RequestParam String isbn, Principal principal) throws FileNotFoundException {
         String filename = Thread.currentThread().getContextClassLoader()
-                .getResource("static/book/" + bookService.findById(isbn).orElse(new Book()).getBookUrl()).getPath();
+                .getResource("static/book/" + bookService.findElectronicByUserIdAndIsbn(
+                        visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getId(),
+                        isbn).orElse(new Book()).getBookUrl()).getPath();
 
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -218,10 +186,18 @@ public class BookController {
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
 
-        ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+        return ResponseEntity.ok().headers(headers)
                 .contentLength(file.length())
                 .contentType(MediaType.parseMediaType("application/txt")).body(resource);
+    }
 
-        return responseEntity;
+    public static ModelAndView bookSelectionModelCreator(Iterable<Book> books, int page, BookService bookService) {
+        ModelAndView model = new ModelAndView("fragment/book_selection");
+        List<BookReviewDto> bookReview = new ArrayList<>();
+        books.forEach(book -> bookReview.add(
+                BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn()))));
+        model.addObject("books", bookReview);
+        model.addObject("page", page);
+        return model;
     }
 }

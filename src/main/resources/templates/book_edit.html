@@ -33,7 +33,7 @@
             <div class="col-md-4 mb-3">
                 <label for="p_house">Publishing house</label>
                 <input type="text" class="form-control" id="p_house" th:field="*{publishingHouse}"
-                       placeholder="published by" th:value="${bookdto.publishingHouse}" required>
+                       placeholder="published by" th:value="${bookdto.publishingHouse}">
                 <div class="invalid-feedback"></div>
             </div>
         </div>
@@ -41,13 +41,13 @@
         <div class="form-group row">
             <div class="col-md-4 mb-3">
                 <label for="count">Count</label>
-                <input type="text" class="form-control" id="count"
+                <input type="text" class="form-control" id="count" min="0"
                        placeholder="Quantity of books" th:value="${bookdto.count}" th:field="*{count}" required>
                 <div class="invalid-feedback">Quantity of books</div>
             </div>
             <div class="col-md-4 mb-3">
                 <label for="price">Price</label>
-                <input type="text" class="form-control" id="price"
+                <input type="text" class="form-control" id="price" min="0"
                        placeholder="Price" th:value="${bookdto.price}" th:field="*{price}" required>
                 <div class="invalid-feedback">Price of book</div>
             </div>
@@ -55,7 +55,7 @@
             <div class="col-md-4 mb-3">
                 <label for="year">Year of publishing</label>
                 <input type="text" class="form-control" id="year"
-                       placeholder="Year" th:value="${bookdto.year}" th:field="*{year}" required>
+                       placeholder="Year" th:value="${bookdto.year}" th:field="*{year}">
                 <div class="invalid-feedback">Year</div>
             </div>
         </div>
@@ -90,7 +90,6 @@
                         <option th:each="genre : ${genres}"
                                 th:value="${genre}"
                                 th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(genre,'_',' ')))}"></option>
-
                     </select>
                 </div>
             </div>
@@ -105,8 +104,8 @@
             </div>
             <div class="col-md-4 mb-3">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="bookUrl" th:field="*{book}">
-                    <label class="custom-file-label" for="custom_cover">Choose a book</label>
+                    <input type="file" class="custom-file-input" id="book" th:field="*{book}">
+                    <label class="custom-file-label" for="book">Choose a book*</label>
                 </div>
             </div>
         </div>
@@ -115,6 +114,9 @@
                 <button class="btn btn-lg btn-info text-uppercase" type="submit" formmethod="post" value="Upload">
                     Update
                 </button>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label id="information"></label>
             </div>
             <div class="col-md-4 mb-3">
                 <input type="text" class="form-control invisible" th:value="*{coverUrl}" th:field="*{coverUrl}"
@@ -126,8 +128,6 @@
             </div>
         </div>
     </form>
-
-    <div th:replace="author_edit :: author_form(${author})"></div>
 </div>
 
 <script>
@@ -140,6 +140,5 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
-
 </body>
 </html>

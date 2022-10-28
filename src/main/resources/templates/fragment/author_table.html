@@ -1,0 +1,19 @@
+<div id="authorTable" th:fragment="table">
+<table class="table" >
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">First name</th>
+        <th scope="col">Last name</th>
+    </tr>
+    </thead>
+    <tbody th:each="author : ${authors}">
+    <tr>
+        <th scope="row"><button type="button" class="btn btn-link" th:text="${author.id}"
+                                th:attr="onclick=|setId('${author.id}','${author.firstName}','${author.lastName}')|" >Id</button></th>
+        <td th:text="${author.firstName}">first name</td>
+        <td th:text="${author.lastName}">last name</td>
+    </tr>
+    </tbody>
+</table>
+</div>

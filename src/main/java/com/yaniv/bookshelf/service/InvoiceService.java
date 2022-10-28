@@ -5,6 +5,7 @@ import com.yaniv.bookshelf.model.enums.OrderStatus;
 import com.yaniv.bookshelf.repository.InvoiceRepository;
 import com.yaniv.bookshelf.repository.OrderedBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -29,11 +30,11 @@ public class InvoiceService {
         invoiceRepository.save(invoice);
     }
 
-    public Iterable<Invoice> getAllByEmail(String email, int page) {
+    public Page<Invoice> getAllByEmail(String email, int page) {
         return invoiceRepository.findAllByBuyer_EmailOrderByOrderedAtDesc(email, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
-    public Iterable<Invoice> getAllByStatus(OrderStatus status, int page) {
+    public Page<Invoice> getAllByStatus(OrderStatus status, int page) {
         return invoiceRepository.findByStatusOrderByOrderedAtDesc(status, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 

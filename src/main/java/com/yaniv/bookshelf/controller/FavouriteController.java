@@ -11,6 +11,7 @@ import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,17 +44,14 @@ public class FavouriteController {
     @GetMapping
     public ModelAndView getFavourite(Principal principal) {
         Optional<Visitor> visitorOptional = visitorService.findByEmail(principal.getName());
-        if(visitorOptional.isPresent()){
+        if (visitorOptional.isPresent()) {
             String favouriteId = favouriteService.getFavourite(visitorOptional.get()).getId();
             Iterable<Book> books = favouriteService.getBooks(0, favouriteId);
             ModelAndView modelAndView = new ModelAndView("favourite");
             List<BookReviewDto> bookReview = new ArrayList<>();
-            books.forEach(book ->
-                    bookReview.add(
-                            BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                            )));
+            books.forEach(book -> bookReview.add(BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn()))));
             modelAndView.addObject("books", bookReview);
-            modelAndView.addObject("page",0);
+            modelAndView.addObject("page", 0);
             return modelAndView;
         }
         return null;
@@ -64,27 +62,18 @@ public class FavouriteController {
     public ModelAndView getFavouritePage(int page) {
         LOGGER.info("pageable");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Optional<Visitor> visitorOptional = visitorService.findByEmail( authentication.getName());
-        if(visitorOptional.isPresent()){
+        Optional<Visitor> visitorOptional = visitorService.findByEmail(authentication.getName());
+        if (visitorOptional.isPresent()) {
             String favouriteId = favouriteService.getFavourite(visitorOptional.get()).getId();
             LOGGER.info("favouriteId: {}", favouriteId);
-            Set<Book> books = StreamSupport.stream(favouriteService.getBooks(page, favouriteId).spliterator(),true).collect(Collectors.toSet());
-            if(books.size() == 0){
-                page--;
+            Page<Book> bookPage = favouriteService.getBooks(page, favouriteId);
+            if ((bookPage.getTotalPages() - 1  < page)&&(bookPage.getTotalPages()!=0)) {
+                page = bookPage.getTotalPages() - 1;
+                bookPage = favouriteService.getBooks(page, favouriteId);
             }
-            books.forEach(book -> LOGGER.info("Book {}", book));
-            ModelAndView modelAndView = new ModelAndView("fragment/book_selection");
-            List<BookReviewDto> bookReview = new ArrayList<>();
-            books.forEach(book ->
-                    bookReview.add(
-                            BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                            )));
-            modelAndView.addObject("books", bookReview);
-            modelAndView.addObject("page",page);
-            return modelAndView;
+            return BookController.bookSelectionModelCreator(bookPage, page, bookService);
         }
         return null;
-
     }
 
     @PostMapping("/add")
@@ -97,7 +86,7 @@ public class FavouriteController {
                 visitorService.findByEmail(name).orElseGet(() -> null)));
         if (optionalBook.isPresent()) {
             Book book = optionalBook.get();
-            if(favourite.getBooks().contains(book)){
+            if (favourite.getBooks().contains(book)) {
                 favourite.removeBook(book);
                 LOGGER.info("Removed - {}", book);
             } else {

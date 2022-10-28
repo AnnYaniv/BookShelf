@@ -1,5 +1,6 @@
 package com.yaniv.bookshelf.dto;
 
+import com.yaniv.bookshelf.dto.enums.Sort;
 import com.yaniv.bookshelf.model.enums.Genre;
 import lombok.*;
 

@@ -4,7 +4,7 @@ $(function () {
 
         var visitorDto = {
             email: $('#email').val(),
-            password: $('#password').val(),
+            password: "",
             userName: $('#username').val()
         };
 

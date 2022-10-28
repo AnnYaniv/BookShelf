@@ -6,9 +6,11 @@ import com.yaniv.bookshelf.repository.impl.BookFilter;
 import com.yaniv.bookshelf.repository.BookRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,11 +30,15 @@ public class BookService {
         return bookRepository.findByUserIdAndIsbn(userId, isbn);
     }
 
+    public Optional<Book> findElectronicByUserIdAndIsbn(String userId, String isbn){
+        return bookRepository.findElectronicByUserIdAndIsbn(userId, isbn);
+    }
+
     public boolean isBookBought(String userId, String isbn){
         return bookRepository.findByUserIdAndIsbn(userId, isbn).isPresent();
     }
 
-    public Iterable<Book> getAll(int page){
+    public Page<Book> getAll(int page){
         return bookRepository.findAll(PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
@@ -43,19 +49,19 @@ public class BookService {
     public Optional<Book> findById(String id){
         return bookRepository.findByIsbn(id);
     }
-    public Iterable<Book> findByNameLike(String name, int page){
+    public Page<Book> findByNameLike(String name, int page){
         return bookRepository.findByNameLike(name, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
-    public Iterable<Book> findByUser(String id, int page){
+    public Page<Book> findByUser(String id, int page){
         return bookRepository.findByUser(id, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
-    public Iterable<Book> findByUserElectronic(String id, int page){
+    public Page<Book> findByUserElectronic(String id, int page){
         return bookRepository.findByUserElectronic(id, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 
-    public Iterable<Book> filterBook(FilterDto filterDto){
+    public List<Book> filterBook(FilterDto filterDto){
         BookFilter filter = bookFilter.clearQuery();
         if((filterDto.getGenre()!=null)&&(!filterDto.getGenre().isEmpty())){
             filter.filterByGenres(filterDto.getGenre());

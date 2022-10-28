@@ -8,6 +8,7 @@ import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,7 +21,6 @@ import java.util.stream.StreamSupport;
 @RestController
 public class ReviewController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReviewController.class);
-
     private final ReviewService reviewService;
     private final VisitorService visitorService;
 
@@ -46,14 +46,14 @@ public class ReviewController {
     public ModelAndView getAllReviews(@RequestParam String isbn, @RequestParam int page) {
         ModelAndView modelAndView = new ModelAndView("fragment/reviews_container");
         LOGGER.info("Reviews for {}", isbn);
-        List<Review> reviews = StreamSupport.stream(reviewService.findByBook_Isbn(isbn,0).spliterator(), false).toList();
-        if ((reviews.size() == 0) && (page != 0)) {
-            page--;
-            reviews = StreamSupport.stream(reviewService.findByBook_Isbn(isbn,0).spliterator(), false).toList();
+        Page<Review> reviewPage = reviewService.findByBook_Isbn(isbn,0);
+        if (reviewPage.getTotalPages() < page)  {
+            page = reviewPage.getTotalPages();
+            reviewPage = reviewService.findByBook_Isbn(isbn,0);
         }
-        reviews.forEach(review -> review.setVisitor(visitorService.findById(review.getVisitor())
+        reviewPage.forEach(review -> review.setVisitor(visitorService.findById(review.getVisitor())
                 .orElse(new Visitor()).getUserName()));
-        modelAndView.addObject("reviews", reviews);
+        modelAndView.addObject("reviews", reviewPage);
         modelAndView.addObject("page", page);
         return modelAndView;
     }

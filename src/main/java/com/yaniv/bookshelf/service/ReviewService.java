@@ -3,6 +3,7 @@ package com.yaniv.bookshelf.service;
 import com.yaniv.bookshelf.model.Review;
 import com.yaniv.bookshelf.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class ReviewService {
     public Review save(Review review) {
         return reviewRepository.save(review);
     }
-    public Iterable<Review> findByBook_Isbn(String isbn, int page){
+    public Page<Review> findByBook_Isbn(String isbn, int page){
         return reviewRepository.findByBook(isbn, PageRequest.of(page, ITEMS_PER_PAGE));
     }
 

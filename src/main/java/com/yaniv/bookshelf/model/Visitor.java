@@ -39,4 +39,11 @@ public class Visitor implements Serializable {
     private String email;
 
     private String password;
+
+    @PrePersist
+    public void prePersist() {
+        if(StringUtils.isBlank(userName)){
+            userName = email.split("@")[0];
+        }
+    }
 }

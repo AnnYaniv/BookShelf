@@ -35,6 +35,11 @@ public interface BookRepository extends JpaRepository<Book, String> {
     @Override
     Page<Book> findAll(Pageable pageable);
 
+    @Query("select distinct book from Invoice inv join inv.buyer visitor " +
+            "join inv.booksInOrder bookOrder join bookOrder.book book where " +
+            "visitor.id = :userId and book.isbn = :isbn and bookOrder.bookType = 'ELECTRONIC'")
+    Optional<Book> findElectronicByUserIdAndIsbn(@Param("userId") String id, @Param("isbn") String isbn);
+
     @Query("select avg(rev.mark) from Review rev where rev.book = :isbn")
     Double getAvgByBook(@Param("isbn") String isbn);
 }

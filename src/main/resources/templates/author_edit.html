@@ -48,35 +48,12 @@
                     </button>
                 </div>
             </div>
-
-
         </form>
     </div>
-    <table class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">First name</th>
-            <th scope="col">Last name</th>
-        </tr>
-        </thead>
-        <tbody th:each="author : ${authors}">
-        <tr>
-            <th scope="row"><button type="button" class="btn btn-link" th:text="${author.id}"
-                                    th:attr="onclick=|setId('${author.id}','${author.firstName}','${author.lastName}')|" >Id</button></th>
-            <td th:text="${author.firstName}">first name</td>
-            <td th:text="${author.lastName}">last name</td>
-        </tr>
-        </tbody>
-    </table>
+    <nav th:replace="fragment/pagination :: page(page=${page})"></nav>
+    <div id="authorTable" th:replace="fragment/author_table :: table(authors=${authors})"></div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript">
-        function setId(id, name, lastName) {
-            document.getElementById("authorId").value = id;
-            document.getElementById("name").value = name;
-            document.getElementById("l_name").value = lastName;
-        }
-    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="script/author.js"></script>
 </body>
 </html>

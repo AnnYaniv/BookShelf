@@ -3,7 +3,7 @@
         <div class="form-group row">
             <div class="col-md-4 mb-3">
                 <label for="email">Email</label>
-                <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}" required>
+                <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}" readonly required>
                 <div class="invalid-feedback">Add email</div>
             </div>
             <div class="col-md-4 mb-3">
@@ -16,12 +16,12 @@
 
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="p_house">Password</label>
-                <input type="text" class="form-control" id="p_house"
-                       placeholder="Password">
-                <div class="invalid-feedback"></div>
-            </div>
+<!--            <div class="col-md-4 mb-3">-->
+<!--                <label for="p_house">Password</label>-->
+<!--                <input type="text" class="form-control" id="p_house"-->
+<!--                       placeholder="Password">-->
+<!--                <div class="invalid-feedback"></div>-->
+<!--            </div>-->
             <div class="col-md-4 mb-3">
                 <button type="button" class="btn btn-success" id="update">Update</button>
             </div>

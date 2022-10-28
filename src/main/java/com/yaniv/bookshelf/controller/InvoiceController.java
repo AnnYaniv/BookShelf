@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,7 +25,6 @@ import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/cart")
@@ -45,7 +45,7 @@ public class InvoiceController {
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/add")
-    public ResponseEntity addProduct(@CookieValue(value = "invoice", required = false) String invoice, String isbn) throws IOException {
+    public ResponseEntity addProduct(@CookieValue(value = "invoice", required = false) String invoice, String isbn) {
         LOGGER.info("book: {}", isbn);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         if (cart.containsKey(isbn)) {
@@ -55,7 +55,7 @@ public class InvoiceController {
         }
         LOGGER.info("invoice: {}", cart);
         var cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
-                .path("/cart").build();
+                .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -64,12 +64,10 @@ public class InvoiceController {
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/add-electronic")
     public ResponseEntity addElectronic(@CookieValue(value = "elversion", required = false) String invoice, String isbn) throws IOException {
-        LOGGER.info("book electronic: {}", isbn);
         Set<String> cart = cartMapper.toSet(invoice);
         cart.add(isbn);
-        LOGGER.info("invoice: {}", cart);
         var cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
-                .path("/cart").build();
+                .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -82,7 +80,6 @@ public class InvoiceController {
         ModelAndView modelAndView = new ModelAndView("cart");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
-        LOGGER.info("Cart: {}", invoice);
         if (cart != null) {
             List<OrderedBook> books = new ArrayList<>(cart.entrySet().stream().map(entry ->
                     new OrderedBook("id", bookService.findById(entry.getKey()).orElse(new Book()),
@@ -109,7 +106,7 @@ public class InvoiceController {
         LOGGER.info("Invoice {}", cart);
         cart.remove(isbn);
         ResponseCookie cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
-                .path("/cart").build();
+                .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -117,13 +114,14 @@ public class InvoiceController {
 
     @DeleteMapping
     @SneakyThrows
-    public ResponseEntity delete(@RequestParam String isbn, @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
+    public ResponseEntity delete(@RequestParam String isbn,
+                                 @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
         LOGGER.info("On delete {}", isbn);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         LOGGER.info("Invoice {}", cart);
         cart.remove(isbn);
         ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
-                .path("/cart").build();
+                .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -131,12 +129,14 @@ public class InvoiceController {
 
     @PutMapping
     @SneakyThrows
-    public ResponseEntity update(@RequestParam String isbn, @RequestParam int count, @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
+    public ResponseEntity update(@RequestParam String isbn,
+                                 @RequestParam int count,
+                                 @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
         LOGGER.info("On update {}-{}", isbn, count);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         cart.put(isbn, count);
         ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
-                .path("/cart").build();
+                .path("/").build();
         LOGGER.info("cart now-{}", cart);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -170,17 +170,12 @@ public class InvoiceController {
         Invoice inv = new Invoice();
         inv.setBooksInOrder(books);
         inv.setBuyer(visitor);
-
         invoiceService.save(inv);
-
-        Map<String, Integer> emptyMap = new HashMap<>();
-        Set<String> emptySet = new HashSet<>();
-        ResponseCookie cookie = ResponseCookie.from("invoice",
-                        URLEncoder.encode(cartMapper.toJson(emptyMap)))
-                .path("/cart").build();
-        ResponseCookie cookieElectronic = ResponseCookie.from("elversion",
-                        URLEncoder.encode(cartMapper.setToJson(emptySet)))
-                .path("/cart").build();
+        ResponseCookie cookie = ResponseCookie.from("invoice","%7B+%7D")
+                .path("/").build();
+        ResponseCookie cookieElectronic = ResponseCookie.from("elversion","%5B+%5D")
+                .path("/").build();
+        LOGGER.info("CookieElectronic: {}, Cokie: {}", cookieElectronic, cookie);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString())
                 .build();
@@ -211,29 +206,26 @@ public class InvoiceController {
 
     @GetMapping("/all")
     public ModelAndView all(Principal principal, @RequestParam int page) {
-        Iterable<Invoice> invoices = invoiceService.getAllByEmail(principal.getName(), page);
-        List<Invoice> invoicesList = StreamSupport.stream(invoices.spliterator(), false).toList();
-        if ((invoicesList.size() == 0) && (page != 0)) {
-            page--;
-            invoicesList = StreamSupport.stream(invoiceService.getAllByEmail(principal.getName(), page).spliterator(), false).toList();
+        Page<Invoice> invoicePage = invoiceService.getAllByEmail(principal.getName(), page);
+        if ((invoicePage.getTotalPages() - 1 < page)&&(invoicePage.getTotalPages()!=0 )) {
+            page = invoicePage.getTotalPages() - 1;
+            invoicePage = invoiceService.getAllByEmail(principal.getName(), page);
         }
         ModelAndView model = new ModelAndView("fragment/all_invoices");
-        model.addObject("invoices", invoicesList);
+        model.addObject("invoices", invoicePage.getContent());
         model.addObject("page", page);
         return model;
     }
 
     @GetMapping("/manage")
     public ModelAndView manage(@RequestParam int page, @RequestParam OrderStatus status) {
-        Iterable<Invoice> invoices = invoiceService.getAllByStatus(status, page);
-        List<Invoice> invoicesList = StreamSupport.stream(invoices.spliterator(), false).toList();
-        if ((invoicesList.size() == 0) && (page != 0)) {
-            page--;
-            invoicesList = StreamSupport.stream(invoiceService.getAllByStatus(status, page).spliterator(), false).toList();
+        Page<Invoice> invoicePage = invoiceService.getAllByStatus(status, page);
+        if ((invoicePage.getTotalPages() - 1 < page)&&(invoicePage.getTotalPages() != 0)) {
+            page = invoicePage.getTotalPages() - 1;
+            invoicePage = invoiceService.getAllByStatus(status, page);
         }
-        LOGGER.info("manage sort: {}", status);
         ModelAndView modelAndView = new ModelAndView("fragment/filter_invoice");
-        modelAndView.addObject("invoices", invoicesList);
+        modelAndView.addObject("invoices", invoicePage.getContent());
         modelAndView.addObject("cur_status", status);
         modelAndView.addObject("page", page);
         return modelAndView;

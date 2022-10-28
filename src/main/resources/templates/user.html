@@ -10,6 +10,7 @@
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="script/clean_cart.js"></script>
     <style>
         .card-img-top {
             width: 100%;
@@ -26,7 +27,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="clean()">
 <header th:replace="fragment/header :: header"></header>
 <div class="main h-100 d-flex flex-column">
     <div class="container-fluid d-flex flex-fill">

@@ -74,7 +74,16 @@ $('#fav-a').on('click', function () {
 
 $('#create-cart-button').on('click', function () {
     console.log("create inv");
+    setCookie("delete","delete",2);
     $.post('/cart/create', function(response){
         console.log(response);
+
     });
 });
+
+function setCookie(c_name, value, exdays) {
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
+    document.cookie = c_name + "=" + c_value + ";path=/";
+}

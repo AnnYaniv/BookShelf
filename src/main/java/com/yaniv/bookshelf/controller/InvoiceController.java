@@ -1,6 +1,7 @@
 package com.yaniv.bookshelf.controller;
 
 import com.yaniv.bookshelf.mapper.CartMapper;
+import com.yaniv.bookshelf.mapper.OrderedBookMapper;
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.Invoice;
 import com.yaniv.bookshelf.model.OrderedBook;
@@ -77,23 +78,12 @@ public class InvoiceController {
     @SneakyThrows
     public ModelAndView getInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
                                    @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
+        LOGGER.info("Showing cart: {} , {}", invoice, elVersion);
         ModelAndView modelAndView = new ModelAndView("cart");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
-        if (cart != null) {
-            List<OrderedBook> books = new ArrayList<>(cart.entrySet().stream().map(entry ->
-                    new OrderedBook("id", bookService.findById(entry.getKey()).orElse(new Book()),
-                            entry.getValue(), 0, BookType.PAPER)).toList());
-            if (cartElect != null) {
-                for (String id : cartElect) {
-                    books.add(new OrderedBook("id", bookService.findById(id).orElse(new Book()),
-                            1, 0, BookType.ELECTRONIC));
-                }
-            }
-            modelAndView.addObject("books", books);
-        } else {
-            modelAndView.addObject("books", new LinkedList<OrderedBook>());
-        }
+        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
+        modelAndView.addObject("books", books);
         return modelAndView;
     }
 
@@ -153,31 +143,22 @@ public class InvoiceController {
         Set<String> cartElect = cartMapper.toSet(elVersion);
 
         LOGGER.info("Create paper");
-        Set<OrderedBook> books = cart.entrySet().stream().map(entry ->
-                        new OrderedBook(null, bookService.findById(entry.getKey()).orElse(new Book()),
-                                entry.getValue(), bookService.findById(entry.getKey()).orElse(new Book()).getPrice(),
-                                BookType.PAPER))
-                .collect(Collectors.toSet());
-        if (cartElect != null) {
-            LOGGER.info("Create electronic");
-            for (String id : cartElect) {
-                books.add(new OrderedBook(null, bookService.findById(id).orElse(new Book()),
-                        1, bookService.findById(id).orElse(new Book()).getPrice(), BookType.ELECTRONIC));
-            }
-        }
+
+        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
 
         Invoice inv = new Invoice();
         inv.setBooksInOrder(books);
         inv.setBuyer(visitor);
         invoiceService.save(inv);
-        ResponseCookie cookie = ResponseCookie.from("invoice","%7B+%7D")
+        ResponseCookie cookie = ResponseCookie.from("invoice", "%7B+%7D")
                 .path("/").build();
-        ResponseCookie cookieElectronic = ResponseCookie.from("elversion","%5B+%5D")
+        ResponseCookie cookieElectronic = ResponseCookie.from("elversion", "%5B+%5D")
                 .path("/").build();
+        ResponseCookie deleteCookie = ResponseCookie.from("delete", URLEncoder.encode("delete")).path("/").build();
         LOGGER.info("CookieElectronic: {}, Cokie: {}", cookieElectronic, cookie);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString(), deleteCookie.toString())
                 .build();
     }
 
@@ -187,17 +168,7 @@ public class InvoiceController {
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
         ModelAndView model = new ModelAndView("cart_create");
-        Set<OrderedBook> books = cart.entrySet().stream().map(entry ->
-                        new OrderedBook(null, bookService.findById(entry.getKey()).orElse(new Book()),
-                                entry.getValue(), bookService.findById(entry.getKey()).orElse(new Book()).getPrice(),
-                                BookType.PAPER))
-                .collect(Collectors.toSet());
-        if (cartElect != null) {
-            for (String id : cartElect) {
-                books.add(new OrderedBook(null, bookService.findById(id).orElse(new Book()),
-                        1, bookService.findById(id).orElse(new Book()).getPrice(), BookType.ELECTRONIC));
-            }
-        }
+        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
         model.addObject("books", books);
         model.addObject("total", books.stream()
                 .mapToDouble(orderedBook -> orderedBook.getPrice() * orderedBook.getQuantity()).sum());
@@ -207,7 +178,7 @@ public class InvoiceController {
     @GetMapping("/all")
     public ModelAndView all(Principal principal, @RequestParam int page) {
         Page<Invoice> invoicePage = invoiceService.getAllByEmail(principal.getName(), page);
-        if ((invoicePage.getTotalPages() - 1 < page)&&(invoicePage.getTotalPages()!=0 )) {
+        if ((invoicePage.getTotalPages() - 1 < page) && (invoicePage.getTotalPages() != 0)) {
             page = invoicePage.getTotalPages() - 1;
             invoicePage = invoiceService.getAllByEmail(principal.getName(), page);
         }
@@ -220,7 +191,7 @@ public class InvoiceController {
     @GetMapping("/manage")
     public ModelAndView manage(@RequestParam int page, @RequestParam OrderStatus status) {
         Page<Invoice> invoicePage = invoiceService.getAllByStatus(status, page);
-        if ((invoicePage.getTotalPages() - 1 < page)&&(invoicePage.getTotalPages() != 0)) {
+        if ((invoicePage.getTotalPages() - 1 < page) && (invoicePage.getTotalPages() != 0)) {
             page = invoicePage.getTotalPages() - 1;
             invoicePage = invoiceService.getAllByStatus(status, page);
         }
@@ -245,7 +216,7 @@ public class InvoiceController {
 
     @PutMapping("/manage")
     public ModelAndView updateInvoice(@RequestParam String id, @RequestParam OrderStatus status) {
-        LOGGER.info("status put: {}",status);
+        LOGGER.info("status put: {}", status);
         Invoice invoice = invoiceService.findById(id).orElse(new Invoice());
         invoiceService.save(StatusValidator.validateStatus(invoice, status, bookService));
         return getById(id);

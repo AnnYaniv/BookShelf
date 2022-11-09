@@ -2,7 +2,6 @@ package com.yaniv.bookshelf.dto;
 
 import com.yaniv.bookshelf.model.enums.Genre;
 import lombok.*;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

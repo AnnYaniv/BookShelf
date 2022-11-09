@@ -7,7 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -22,15 +21,6 @@ public class Author {
     @NotBlank
     private String firstName;
     private String lastName;
-
-//    @ManyToMany
-//    @JoinTable(
-//            name = "book_author",
-//            joinColumns = { @JoinColumn(name = "author_id", referencedColumnName="id")},
-//            inverseJoinColumns = { @JoinColumn(name = "book_isbn", referencedColumnName="isbn")}
-//    )
-//    private Set<Book> books = new java.util.LinkedHashSet<>();
-
 
     @Override
     public String toString() {

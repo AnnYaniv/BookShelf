@@ -10,17 +10,14 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class Visitor implements Serializable {
+public class Visitor {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -31,7 +28,7 @@ public class Visitor implements Serializable {
 
     private String userName;
 
-    @OneToMany(mappedBy = "id" ,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Invoice> invoices;
 

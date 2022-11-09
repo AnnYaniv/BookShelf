@@ -1,8 +1,8 @@
 package com.yaniv.bookshelf.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,6 +13,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@ToString
 public class Favourite implements Serializable {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -23,10 +24,11 @@ public class Favourite implements Serializable {
     private Visitor visitor;
 
     @ManyToMany
+    @ToString.Exclude
     private Set<Book> books;
 
     public Favourite(){
-        books = new HashSet<Book>();
+        books = new HashSet<>();
     }
 
     public boolean addBook(Book book) {
@@ -35,14 +37,5 @@ public class Favourite implements Serializable {
 
     public boolean removeBook(Book book) {
         return books.remove(book);
-    }
-
-    @Override
-    public String toString() {
-        return "Favourite{" +
-                "id='" + id + '\'' +
-                ", visitor=" + visitor +
-                ", books=" + books +
-                '}';
     }
 }

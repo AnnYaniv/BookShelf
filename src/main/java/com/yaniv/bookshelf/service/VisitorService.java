@@ -36,7 +36,7 @@ public class VisitorService {
         return visitorRepository.findByEmail(email);
     }
     public Visitor createUser(Visitor visitor){
-        LOGGER.info(String.valueOf(visitor));
+        LOGGER.info("new user creating {}", visitor.getEmail());
         visitor.setRole(Role.USER);
         return visitorRepository.save(visitor);
     }

@@ -6,14 +6,14 @@ public enum Permission implements GrantedAuthority {
     BOOK_READ("book:read"), BOOK_WRITE("book:write"),
     AUTHOR_READ("author:read"), AUTHOR_WRITE("author:write"),
     INVOICE_WRITE("invoice:write");
-    private final String permission;
+    private final String permissionName;
 
-    Permission(String permission) {
-        this.permission = permission;
+    Permission(String permissionName) {
+        this.permissionName = permissionName;
     }
 
     @Override
     public String getAuthority() {
-        return permission;
+        return permissionName;
     }
 }

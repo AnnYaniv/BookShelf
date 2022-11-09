@@ -1,14 +1,11 @@
 package com.yaniv.bookshelf.model.ids;
 
-import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.model.Visitor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
-import javax.persistence.OneToOne;
 import java.io.Serializable;
 
 @Getter

@@ -12,32 +12,31 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
-    Optional<Book> findByName(String name);
     Optional<Book> findByIsbn(String s);
 
     @Query("select book from Book book where book.name like concat('%', :bookName, '%')")
     Page<Book> findByNameLike(@Param("bookName") String name, Pageable pageable);
 
     @Query("select distinct book from Invoice inv join inv.buyer visitor " +
-            "join inv.booksInOrder bookOrder join bookOrder.book book where visitor.id = :userId")
+            "join inv.booksInOrder bookOrder join bookOrder.book book where visitor.id = :userId " +
+            "and inv.status <> 'DECLINED'")
     Page<Book> findByUser(@Param("userId") String id, Pageable pageable);
 
     @Query("select distinct book from Invoice inv join inv.buyer visitor " +
             "join inv.booksInOrder bookOrder join bookOrder.book book " +
-            "where visitor.id = :userId and bookOrder.bookType = 'ELECTRONIC'")
+            "where visitor.id = :userId and bookOrder.bookType = 'ELECTRONIC'" +
+            "and inv.status <> 'DECLINED'")
     Page<Book> findByUserElectronic(@Param("userId") String id, Pageable pageable);
 
     @Query("select distinct book from Invoice inv join inv.buyer visitor " +
             "join inv.booksInOrder bookOrder join bookOrder.book book where " +
-            "visitor.id = :userId and book.isbn = :isbn")
+            "visitor.id = :userId and book.isbn = :isbn and inv.status <> 'DECLINED'")
     Optional<Book> findByUserIdAndIsbn(@Param("userId") String id, @Param("isbn") String isbn);
-
-    @Override
-    Page<Book> findAll(Pageable pageable);
 
     @Query("select distinct book from Invoice inv join inv.buyer visitor " +
             "join inv.booksInOrder bookOrder join bookOrder.book book where " +
-            "visitor.id = :userId and book.isbn = :isbn and bookOrder.bookType = 'ELECTRONIC'")
+            "visitor.id = :userId and book.isbn = :isbn and bookOrder.bookType = 'ELECTRONIC' " +
+            "and inv.status <> 'DECLINED'")
     Optional<Book> findElectronicByUserIdAndIsbn(@Param("userId") String id, @Param("isbn") String isbn);
 
     @Query("select avg(rev.mark) from Review rev where rev.book = :isbn")

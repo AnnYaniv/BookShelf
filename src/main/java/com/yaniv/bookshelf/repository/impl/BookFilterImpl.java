@@ -1,16 +1,9 @@
 package com.yaniv.bookshelf.repository.impl;
 
 import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.model.Review;
 import com.yaniv.bookshelf.model.enums.Genre;
-import com.yaniv.bookshelf.repository.Filter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.yaniv.bookshelf.repository.BookFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -20,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class BookFilter implements Filter<Book> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger("repo-log");
+public class BookFilterImpl implements BookFilter {
     private static final int PAGE_SIZE = 9;
     private final EntityManager entityManager;
     private CriteriaBuilder criteriaBuilder;
@@ -32,7 +23,7 @@ public class BookFilter implements Filter<Book> {
     private List<Predicate> predicates;
 
     @Autowired
-    public BookFilter(EntityManager entityManager) {
+    public BookFilterImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -46,32 +37,38 @@ public class BookFilter implements Filter<Book> {
         return this;
     }
 
+    @Override
     public BookFilter filterByPrice(double lower, double upper){
         Predicate between = criteriaBuilder.between(bookRoot.get("price"), lower, upper);
         predicates.add(between);
         return this;
     }
 
+    @Override
     public BookFilter filterByGenres(List<Genre> genres){
         predicates.add(bookGenre.in(genres));
         return this;
     }
 
+    @Override
     public BookFilter sortByPrice(){
         bookCriteria.orderBy(criteriaBuilder.asc(bookRoot.get("price")));
         return this;
     }
 
+    @Override
     public BookFilter sortByPopularity(){
         bookCriteria.orderBy(criteriaBuilder.asc(bookRoot.get("visited")));
         return this;
     }
 
+    @Override
     public BookFilter sortByPriceDesc(){
         bookCriteria.orderBy(criteriaBuilder.desc(bookRoot.get("price")));
         return this;
     }
 
+    @Override
     public BookFilter sortByPopularityDesc(){
         bookCriteria.orderBy(criteriaBuilder.desc(bookRoot.get("visited")));
         return this;

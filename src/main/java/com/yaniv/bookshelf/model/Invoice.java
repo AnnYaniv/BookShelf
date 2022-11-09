@@ -26,6 +26,7 @@ public class Invoice {
     private OrderStatus status;
 
     @OneToMany
+    @ToString.Exclude
     private Set<OrderedBook> booksInOrder;
 
     @ManyToOne

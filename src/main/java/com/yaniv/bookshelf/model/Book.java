@@ -5,13 +5,14 @@ import com.yaniv.bookshelf.service.BookValidator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
@@ -19,21 +20,22 @@ import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
-public class Book implements Serializable {
+public class Book{
     @Id
     private String isbn;
 
     @NotBlank
     private String name;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_author",
             joinColumns = { @JoinColumn(name = "book_isbn", referencedColumnName="isbn") },
             inverseJoinColumns = { @JoinColumn(name = "author_id", referencedColumnName="id")}
     )
-    private Set<Author> author = new java.util.LinkedHashSet<>();
+    private Set<Author> author = new LinkedHashSet<>();
 
     @Type(type="text")
     private String annotation;
@@ -73,20 +75,4 @@ public class Book implements Serializable {
         this.author.add(author);
     }
 
-    @Override
-    public String toString() {
-        return "Book{" +
-                "isbn='" + isbn + '\'' +
-                ", name='" + name + '\'' +
-                ", author=" + author +
-                ", genre=" + genre +
-                ", year=" + year +
-                ", publishingHouse='" + publishingHouse + '\'' +
-                ", count=" + count +
-                ", price=" + price +
-                ", visited=" + visited +
-                ", cover='" + cover + '\'' +
-                ", bookUrl='" + bookUrl + '\'' +
-                '}';
-    }
 }

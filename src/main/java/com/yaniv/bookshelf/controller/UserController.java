@@ -15,7 +15,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final VisitorService visitorService;
 
     @Autowired
@@ -30,7 +30,6 @@ public class UserController {
 
     @GetMapping("/about")
     public ModelAndView getInfoById(Principal principal) {
-        LOGGER.info("Role: {}", visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getRole());
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         ModelAndView model = new ModelAndView("fragment/user_update");
         model.addObject("visitor", visitor);
@@ -40,7 +39,7 @@ public class UserController {
 
     @PostMapping("/about")
     public ModelAndView updateUser(Principal principal, VisitorDto visitorDto) {
-        LOGGER.info("post /user/about");
+        LOGGER.debug("post /user/about");
         Visitor visitor = visitorService.save(VisitorMapper.toVisitor(visitorDto,
                 visitorService.findByEmail(principal.getName()).orElse(new Visitor())));
         ModelAndView model = new ModelAndView("fragment/user_update");

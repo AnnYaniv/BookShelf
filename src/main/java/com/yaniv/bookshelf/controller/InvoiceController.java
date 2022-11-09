@@ -2,15 +2,11 @@ package com.yaniv.bookshelf.controller;
 
 import com.yaniv.bookshelf.mapper.CartMapper;
 import com.yaniv.bookshelf.mapper.OrderedBookMapper;
-import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.Invoice;
 import com.yaniv.bookshelf.model.OrderedBook;
 import com.yaniv.bookshelf.model.Visitor;
-import com.yaniv.bookshelf.model.enums.BookType;
 import com.yaniv.bookshelf.model.enums.OrderStatus;
-import com.yaniv.bookshelf.service.BookService;
 import com.yaniv.bookshelf.service.InvoiceService;
-import com.yaniv.bookshelf.service.StatusValidator;
 import com.yaniv.bookshelf.service.VisitorService;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -21,24 +17,23 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cart")
 public class InvoiceController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceController.class);
-    private final BookService bookService;
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final InvoiceService invoiceService;
-    private final CartMapper cartMapper;
+    private final OrderedBookMapper orderedBookMapper;
     private final VisitorService visitorService;
+    private final CartMapper cartMapper;
 
     @Autowired
-    public InvoiceController(BookService bookService, InvoiceService invoiceService, VisitorService visitorService) {
-        this.bookService = bookService;
+    public InvoiceController(OrderedBookMapper orderedBookMapper, InvoiceService invoiceService, VisitorService visitorService) {
+        this.orderedBookMapper = orderedBookMapper;
         this.invoiceService = invoiceService;
         this.visitorService = visitorService;
         this.cartMapper = new CartMapper();
@@ -46,16 +41,16 @@ public class InvoiceController {
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/add")
-    public ResponseEntity addProduct(@CookieValue(value = "invoice", required = false) String invoice, String isbn) {
-        LOGGER.info("book: {}", isbn);
+    public ResponseEntity addProduct(@CookieValue(value = "invoice", required = false) String invoice, String isbn) throws UnsupportedEncodingException {
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         if (cart.containsKey(isbn)) {
             cart.put(isbn, cart.get(isbn) + 1);
         } else {
             cart.put(isbn, 1);
         }
-        LOGGER.info("invoice: {}", cart);
-        var cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
+        LOGGER.debug("/add invoice: {}", cart);
+        var cookie = ResponseCookie.from("invoice",
+                        URLEncoder.encode(cartMapper.toJson(cart),"UTF-8"))
                 .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -64,10 +59,10 @@ public class InvoiceController {
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/add-electronic")
-    public ResponseEntity addElectronic(@CookieValue(value = "elversion", required = false) String invoice, String isbn) throws IOException {
+    public ResponseEntity addElectronic(@CookieValue(value = "elversion", required = false) String invoice, String isbn) throws UnsupportedEncodingException {
         Set<String> cart = cartMapper.toSet(invoice);
         cart.add(isbn);
-        var cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
+        var cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart),"UTF-8"))
                 .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -78,11 +73,11 @@ public class InvoiceController {
     @SneakyThrows
     public ModelAndView getInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
                                    @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
-        LOGGER.info("Showing cart: {} , {}", invoice, elVersion);
+        LOGGER.debug("/ paper books: {} , electronic books {}", invoice, elVersion);
         ModelAndView modelAndView = new ModelAndView("cart");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
-        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
+        Set<OrderedBook> books = orderedBookMapper.merge(cart, cartElect);
         modelAndView.addObject("books", books);
         return modelAndView;
     }
@@ -91,11 +86,12 @@ public class InvoiceController {
     @SneakyThrows
     public ResponseEntity deleteElectronic(@RequestParam String isbn,
                                            @CookieValue(value = "elversion", defaultValue = "null") String elVersion) {
-        LOGGER.info("On delete electronic {}", isbn);
+
         Set<String> cart = cartMapper.toSet(elVersion);
-        LOGGER.info("Invoice {}", cart);
+        LOGGER.debug("/delete-electronic delete {}", isbn);
+        LOGGER.debug("/delete-electronic electronic books {}", cart);
         cart.remove(isbn);
-        ResponseCookie cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart)))
+        ResponseCookie cookie = ResponseCookie.from("elversion", URLEncoder.encode(cartMapper.setToJson(cart), "UTF-8"))
                 .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -106,11 +102,11 @@ public class InvoiceController {
     @SneakyThrows
     public ResponseEntity delete(@RequestParam String isbn,
                                  @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
-        LOGGER.info("On delete {}", isbn);
+        LOGGER.debug("/ [delete] isbn {}", isbn);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
-        LOGGER.info("Invoice {}", cart);
+        LOGGER.debug("/ [delete] paper books {}", cart);
         cart.remove(isbn);
-        ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
+        ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart), "UTF-8"))
                 .path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -122,10 +118,10 @@ public class InvoiceController {
     public ResponseEntity update(@RequestParam String isbn,
                                  @RequestParam int count,
                                  @CookieValue(value = "invoice", defaultValue = "null") String invoice) {
-        LOGGER.info("On update {}-{}", isbn, count);
+        LOGGER.debug("/ [put] book {}-{}", isbn, count);
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         cart.put(isbn, count);
-        ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart)))
+        ResponseCookie cookie = ResponseCookie.from("invoice", URLEncoder.encode(cartMapper.toJson(cart), "UTF-8"))
                 .path("/").build();
         LOGGER.info("cart now-{}", cart);
         return ResponseEntity.ok()
@@ -138,13 +134,9 @@ public class InvoiceController {
     public ResponseEntity createInvoice(@CookieValue(value = "invoice", defaultValue = "null") String invoice,
                                         @CookieValue(value = "elversion", defaultValue = "null") String elVersion,
                                         Principal principal) {
-        LOGGER.info("Create invoice");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
-
-        LOGGER.info("Create paper");
-
-        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
+        Set<OrderedBook> books = orderedBookMapper.merge(cart, cartElect);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
 
         Invoice inv = new Invoice();
@@ -155,8 +147,7 @@ public class InvoiceController {
                 .path("/").build();
         ResponseCookie cookieElectronic = ResponseCookie.from("elversion", "%5B+%5D")
                 .path("/").build();
-        ResponseCookie deleteCookie = ResponseCookie.from("delete", URLEncoder.encode("delete")).path("/").build();
-        LOGGER.info("CookieElectronic: {}, Cokie: {}", cookieElectronic, cookie);
+        ResponseCookie deleteCookie = ResponseCookie.from("delete", URLEncoder.encode("delete", "UTF-8")).path("/").build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString(), cookieElectronic.toString(), deleteCookie.toString())
                 .build();
@@ -168,7 +159,7 @@ public class InvoiceController {
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
         ModelAndView model = new ModelAndView("cart_create");
-        Set<OrderedBook> books = OrderedBookMapper.merge(cart, cartElect, bookService);
+        Set<OrderedBook> books = orderedBookMapper.merge(cart, cartElect);
         model.addObject("books", books);
         model.addObject("total", books.stream()
                 .mapToDouble(orderedBook -> orderedBook.getPrice() * orderedBook.getQuantity()).sum());
@@ -216,9 +207,9 @@ public class InvoiceController {
 
     @PutMapping("/manage")
     public ModelAndView updateInvoice(@RequestParam String id, @RequestParam OrderStatus status) {
-        LOGGER.info("status put: {}", status);
+        LOGGER.info("invoice:{}, new status:{}", id, status);
         Invoice invoice = invoiceService.findById(id).orElse(new Invoice());
-        invoiceService.save(StatusValidator.validateStatus(invoice, status, bookService));
+        invoiceService.save(invoiceService.changeStatus(invoice, status));
         return getById(id);
     }
 }

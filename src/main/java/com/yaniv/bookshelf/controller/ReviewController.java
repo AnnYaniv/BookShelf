@@ -14,13 +14,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.StreamSupport;
 
 @RequestMapping("/review")
 @RestController
 public class ReviewController {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ReviewController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final ReviewService reviewService;
     private final VisitorService visitorService;
 
@@ -33,7 +31,7 @@ public class ReviewController {
 
     @PostMapping()
     public String addReview(@ModelAttribute ReviewDto reviewDto, Principal principal){
-        LOGGER.info("reviewDto {}, {}, {}",reviewDto.getIsbn(),
+        LOGGER.debug("reviewDto {}, {}, {}",reviewDto.getIsbn(),
                 reviewDto.getMark(), reviewDto.getMessage());
 
         return reviewService.save(new Review(reviewDto.getIsbn(),
@@ -45,7 +43,7 @@ public class ReviewController {
     @GetMapping("/all")
     public ModelAndView getAllReviews(@RequestParam String isbn, @RequestParam int page) {
         ModelAndView modelAndView = new ModelAndView("fragment/reviews_container");
-        LOGGER.info("Reviews for {}", isbn);
+        LOGGER.debug("Reviews for {}", isbn);
         Page<Review> reviewPage = reviewService.findByBook_Isbn(isbn,0);
         if (reviewPage.getTotalPages() < page)  {
             page = reviewPage.getTotalPages();

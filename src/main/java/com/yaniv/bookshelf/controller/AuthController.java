@@ -2,13 +2,11 @@ package com.yaniv.bookshelf.controller;
 
 import com.yaniv.bookshelf.dto.VisitorDto;
 import com.yaniv.bookshelf.mapper.VisitorMapper;
-import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.service.VisitorService;
 import com.yaniv.bookshelf.service.VisitorValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -16,14 +14,12 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
-    private final DaoAuthenticationProvider daoAuthenticationProvider;
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final VisitorService visitorService;
 
     @Autowired
-    public AuthController(DaoAuthenticationProvider daoAuthenticationProvider, VisitorService visitorService) {
+    public AuthController(VisitorService visitorService) {
         this.visitorService = visitorService;
-        this.daoAuthenticationProvider = daoAuthenticationProvider;
     }
 
     @GetMapping

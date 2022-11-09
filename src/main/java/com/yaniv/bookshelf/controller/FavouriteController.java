@@ -22,14 +22,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/favourite")
 public class FavouriteController {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(FavouriteController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final FavouriteService favouriteService;
     private final VisitorService visitorService;
     private final BookService bookService;
@@ -60,12 +57,10 @@ public class FavouriteController {
 
     @GetMapping("/pageable")
     public ModelAndView getFavouritePage(int page) {
-        LOGGER.info("pageable");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<Visitor> visitorOptional = visitorService.findByEmail(authentication.getName());
         if (visitorOptional.isPresent()) {
             String favouriteId = favouriteService.getFavourite(visitorOptional.get()).getId();
-            LOGGER.info("favouriteId: {}", favouriteId);
             Page<Book> bookPage = favouriteService.getBooks(page, favouriteId);
             if ((bookPage.getTotalPages() - 1  < page)&&(bookPage.getTotalPages()!=0)) {
                 page = bookPage.getTotalPages() - 1;
@@ -80,7 +75,6 @@ public class FavouriteController {
     public String addBook(String isbn) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
-        LOGGER.info("ISBN: - {}", isbn);
         Optional<Book> optionalBook = bookService.findById(isbn);
         Favourite favourite = favouriteService.getFavourite(Objects.requireNonNull(
                 visitorService.findByEmail(name).orElseGet(() -> null)));
@@ -88,14 +82,13 @@ public class FavouriteController {
             Book book = optionalBook.get();
             if (favourite.getBooks().contains(book)) {
                 favourite.removeBook(book);
-                LOGGER.info("Removed - {}", book);
+                LOGGER.info("Favourite removed - {}, user - {}", book, name);
             } else {
                 favourite.addBook(book);
-                LOGGER.info("Added - {}", book);
+                LOGGER.info("Favourite added - {}, user -{}", book, name);
             }
             favouriteService.save(favourite);
         }
-        LOGGER.info("Book - {}", optionalBook);
         return favourite.getBooks() + "<br>";
     }
 }

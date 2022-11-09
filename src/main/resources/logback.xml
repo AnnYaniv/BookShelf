@@ -9,6 +9,7 @@
     <property name = "repo-file" value = "logs/repo"/>
     <property name = "service-file" value = "logs/service"/>
     <property name = "mapper-file" value = "logs/mapper"/>
+    <property name = "controller-file" value = "logs/controller"/>
 
     <appender name="service-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${service-file}.log</file>
@@ -49,6 +50,19 @@
         </encoder>
     </appender>
 
+    <appender name="controller-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${controller-file}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${controller-file}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="service-log" level="INFO" additivity="true">
         <appender-ref ref="service-logger"/>
     </logger>
@@ -57,11 +71,15 @@
         <appender-ref ref="repo-logger"/>
     </logger>
 
-    <logger name="mapper-log" level="INFO" additivity="true">
+    <logger name="mapper-log" level="WARN" additivity="true">
         <appender-ref ref="mapper-logger"/>
     </logger>
 
-    <root level="INFO">
+    <logger name="controller-log" level="INFO" additivity="true">
+        <appender-ref ref="controller-logger"/>
+    </logger>
+
+    <root level="DEBUG">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

@@ -1,10 +1,8 @@
 package com.yaniv.bookshelf.model;
 
 import com.yaniv.bookshelf.model.enums.OrderStatus;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.yaniv.bookshelf.model.states.*;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -33,13 +31,27 @@ public class Invoice {
     @ManyToOne
     private Visitor buyer;
 
+    @Transient
+    private State state;
+
     @PrePersist
     public void prePersist() {
-        if(orderedAt == null) {
+        if (orderedAt == null) {
             orderedAt = LocalDateTime.now();
         }
-        if(status == null) {
+        if (status == null) {
             status = OrderStatus.CREATING;
+            state = new CreatingState(this);
+        }
+    }
+
+    @PostLoad
+    public void postLoad() {
+        switch (status) {
+            case COMPLETED -> state = new CompletedState(this);
+            case SHIPMENT -> state = new ShipmentState(this);
+            case DECLINED -> state = new DeclinedState(this);
+            case CREATING -> state = new CreatingState(this);
         }
     }
 }

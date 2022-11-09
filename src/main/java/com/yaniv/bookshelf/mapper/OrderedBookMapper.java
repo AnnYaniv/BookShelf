@@ -4,14 +4,22 @@ import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.OrderedBook;
 import com.yaniv.bookshelf.model.enums.BookType;
 import com.yaniv.bookshelf.service.BookService;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class OrderedBookMapper {
-    public static final OrderedBook toOrderedBook(Book book, int quantity, BookType type) {
+    private final BookService bookService;
+
+    public OrderedBookMapper(BookService bookService) {
+        this.bookService = bookService;
+    }
+
+    public OrderedBook toOrderedBook(Book book, int quantity, BookType type) {
         OrderedBook orderedBook = new OrderedBook();
         orderedBook.setBook(book);
         orderedBook.setPrice(book.getPrice());
@@ -20,7 +28,7 @@ public class OrderedBookMapper {
         return orderedBook;
     }
 
-    public static final Set<OrderedBook> merge(Map<String, Integer> cart, Set<String> cartElect, BookService bookService){
+    public Set<OrderedBook> merge(Map<String, Integer> cart, Set<String> cartElect){
         Set<OrderedBook> books = new HashSet<>();
         if (cart != null) {
             books = cart.entrySet().stream().map(entry ->
@@ -30,7 +38,7 @@ public class OrderedBookMapper {
         }
         if (cartElect != null) {
             for (String id : cartElect) {
-                books.add(OrderedBookMapper.toOrderedBook(bookService.findById(id).orElse(new Book()),
+                books.add(toOrderedBook(bookService.findById(id).orElse(new Book()),
                         1, BookType.ELECTRONIC));
             }
         }

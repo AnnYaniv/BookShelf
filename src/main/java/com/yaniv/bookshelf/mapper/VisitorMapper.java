@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 public class VisitorMapper {
 
+    private VisitorMapper() {
+    }
+
     public static Visitor toVisitor(VisitorDto visitorDto, Visitor visitor){
         if(!StringUtils.isBlank(visitorDto.getEmail())) {
             visitor.setEmail(visitorDto.getEmail());

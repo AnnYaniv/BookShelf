@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 
 
 public class BookMapper {
+    private BookMapper() {
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger("mapper-log");
 
     @SneakyThrows

@@ -37,7 +37,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/book")
 public class BookController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BookController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final BookService bookService;
     private final AuthorService authorService;
     private final VisitorService visitorService;
@@ -81,7 +81,7 @@ public class BookController {
             return new ModelAndView("forward:/");
         } else {
             ModelAndView modelAndView = new ModelAndView("book_edit");
-            LOGGER.info("book to edit - {}", optionalBook.get());
+            LOGGER.debug("book to edit - {}", optionalBook.get());
             modelAndView.addObject("bookdto", BookMapper.toDto(optionalBook.get()));
             modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
             Author author = new Author();
@@ -123,10 +123,9 @@ public class BookController {
 
     @GetMapping("/filter")
     public ModelAndView ajaxFilter(@RequestParam String name, @RequestParam int page) {
-        LOGGER.info("ajaxFilter method was called for-{}", name);
-        LOGGER.info("Books-{}", bookService.findByNameLike(name, page));
-        LOGGER.info("page-{}", page);
-        ModelAndView model = new ModelAndView("fragment/book_selection");
+        LOGGER.debug("ajaxFilter method was called for-{}", name);
+        LOGGER.debug("Books-{}", bookService.findByNameLike(name, page));
+        LOGGER.debug("page-{}", page);
         Page<Book> bookPage = bookService.findByNameLike(name, page);
         if (bookPage.getTotalPages() - 1 < page) {
             page = bookPage.getTotalPages() - 1;
@@ -137,7 +136,7 @@ public class BookController {
 
     @GetMapping("/getFilterBy")
     public ModelAndView getFilterBy(@ModelAttribute FilterDto filterDto) {
-        LOGGER.info("filter in getFilterBy: {}", filterDto);
+        LOGGER.debug("filter in getFilterBy: {}", filterDto);
         List<Book> books = bookService.filterBook(filterDto);
         if (books.isEmpty()) {
             filterDto.setPage(0);
@@ -148,7 +147,7 @@ public class BookController {
 
     @GetMapping("/get-by-user")
     public ModelAndView getBooksByUser(Principal principal, @RequestParam int page) {
-        LOGGER.info("get-by-user {}", page);
+        LOGGER.debug("get-by-user {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         Page<Book> bookPage = bookService.findByUser(visitor.getId(), page);
         if ((bookPage.getTotalPages() - 1 < page) && (bookPage.getTotalPages() != 0)) {
@@ -160,7 +159,7 @@ public class BookController {
 
     @GetMapping("/get-by-user-electronic")
     public ModelAndView getBooksByUserElectronic(Principal principal, @RequestParam int page) {
-        LOGGER.info("get-by-user-electronic {}", page);
+        LOGGER.debug("get-by-user-electronic {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         Page<Book> bookPage = bookService.findByUserElectronic(visitor.getId(), page);
         if ((bookPage.getTotalPages() - 1 < page) && (bookPage.getTotalPages() != 0)) {

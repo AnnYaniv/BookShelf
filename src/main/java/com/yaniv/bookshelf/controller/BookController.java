@@ -61,7 +61,7 @@ public class BookController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Optional<Visitor> visitor = visitorService.findByEmail(authentication.getName());
             ModelAndView modelAndView = new ModelAndView("book_detail");
-            modelAndView.addObject("book", book);
+            modelAndView.addObject("book", BookMapper.toDto(book));
             if (visitor.isPresent()) {
                 modelAndView.addObject("isDownload", bookService.findElectronicByUserIdAndIsbn(visitor.get().getId(), isbn).isPresent());
                 modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));

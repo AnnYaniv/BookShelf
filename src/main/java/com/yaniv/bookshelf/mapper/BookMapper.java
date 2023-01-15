@@ -3,16 +3,20 @@ package com.yaniv.bookshelf.mapper;
 import com.yaniv.bookshelf.dto.BookDto;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.model.Book;
+import com.yaniv.bookshelf.service.DriveService;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -36,16 +40,15 @@ public class BookMapper {
         book.setAnnotation(dto.getAnnotation());
         book.setPublishingHouse(dto.getPublishingHouse());
         book.setYear(dto.getYear());
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         MultipartFile cover = dto.getCover();
         if(!cover.isEmpty()) {
-            book.setCover(saveFile(cover,"covers" , loader));
+            book.setCover(saveDrive(cover, dto.getIsbn()));
         } else {
             book.setCover(dto.getCoverUrl());
         }
         MultipartFile bookFile = dto.getBook();
         if(!bookFile.isEmpty()) {
-            book.setBookUrl(saveFile(bookFile,"book" , loader));
+            book.setBookUrl(saveDrive(bookFile, dto.getIsbn()));
         } else {
             book.setBookUrl(dto.getBookUrl());
         }
@@ -58,6 +61,13 @@ public class BookMapper {
         book.setGenre(dto.getGenre());
         book.setVisited(dto.getVisited());
         return book;
+    }
+
+    @SneakyThrows
+    private static String saveDrive(MultipartFile cover, String isbn){
+        byte[] coverFile = cover.getBytes();
+        DriveService.getInstance().upload(isbn, coverFile, DriveService.Folder.COVER, cover.getContentType());
+        return isbn;
     }
 
     private static String saveFile(MultipartFile cover, String folder, ClassLoader loader) throws IOException, URISyntaxException {
@@ -85,10 +95,15 @@ public class BookMapper {
     }
 
     public static BookDto toDto(Book book) {
+
+        ByteArrayOutputStream outputStream = DriveService.getInstance().downloadFile(book.getCover());
+        String byteArr = outputStream != null ? Base64.getEncoder().encodeToString(outputStream.toByteArray()) : null;
+        LOGGER.info("ByteArr {}", byteArr);
         return new BookDto(
                 book.getIsbn(), book.getName(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
-                null,null, book.getCover(),book.getBookUrl() , book.getAuthor().stream().map(Author::getId).toList(),
+                null,null, book.getCover(),book.getBookUrl(),
+                byteArr,book.getAuthor().stream().map(Author::getId).toList(),
                 book.getGenre()
         );
     }

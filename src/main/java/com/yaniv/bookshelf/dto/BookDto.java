@@ -21,6 +21,7 @@ public class BookDto {
     MultipartFile book;
     String coverUrl;
     String bookUrl;
+    String coverByte;
 
     List<String> authorsIds ;
     Set<Genre> genre;

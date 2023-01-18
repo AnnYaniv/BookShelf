@@ -15,7 +15,7 @@
 
 <header th:replace="fragment/header :: header"></header>
 <div class="container py-5">
-    <form class="not-validated" th:action="@{/book/edit}" th:object="${bookdto}" method="post"
+    <form class="not-validated" th:action="@{/book/update}" th:object="${bookdto}" method="post"
           enctype="multipart/form-data">
         <div class="form-group row">
             <div class="col-md-4 mb-3">
@@ -27,7 +27,7 @@
             <div class="col-md-4 mb-3">
                 <label for="name">Title</label>
                 <input type="text" class="form-control" id="name"
-                       placeholder="Title" th:value="${bookdto.name}" th:field="*{name}" required>
+                       placeholder="Title" th:value="${bookdto.title}" th:field="*{title}" required>
                 <div class="invalid-feedback">Add title</div>
             </div>
             <div class="col-md-4 mb-3">
@@ -72,10 +72,10 @@
             <div class="col-md-4 mb-3">
                 <div class="form-group">
                     <label for="authorsIds">Select authors</label>
-                    <select class="form-control" id="authorsIds" th:field="*{authorsIds}" multiple="multiple">
+                    <select class="form-control" id="authorsIds" th:field="*{authors}" multiple="multiple">
                         <option th:each="author : ${authors}"
                                 th:value="${author.id}"
-                                th:selected="${bookdto.authorsIds.contains(author.id)}"
+                                th:selected="${bookdto.authors.contains(author.id)}"
                                 th:text="${author.firstName + ' ' + author.lastName}">
                             Author
                         </option>
@@ -98,13 +98,13 @@
         <div class="form-group row">
             <div class="col-md-4 mb-3">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="custom_cover" th:field="*{cover}">
+                    <input type="file" class="custom-file-input" id="custom_cover" th:field="*{coverMultipart}">
                     <label class="custom-file-label" for="custom_cover">Choose a cover</label>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="book" th:field="*{book}">
+                    <input type="file" class="custom-file-input" id="book" th:field="*{bookMultipart}">
                     <label class="custom-file-label" for="book">Choose a book*</label>
                 </div>
             </div>
@@ -117,12 +117,6 @@
             </div>
             <div class="col-md-4 mb-3">
                 <label id="information"></label>
-            </div>
-            <div class="col-md-4 mb-3">
-                <input type="text" class="form-control invisible" th:value="*{coverUrl}" th:field="*{coverUrl}"
-                       id="coverUrl"/>
-                <input type="text" class="form-control invisible" th:value="*{bookUrl}" th:field="*{bookUrl}"
-                       id="bookUrl"/>
                 <input type="text" class="form-control invisible" th:value="*{visited}" th:field="*{visited}"
                        id="visited"/>
             </div>

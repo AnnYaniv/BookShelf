@@ -1,5 +1,6 @@
 package com.yaniv.bookshelf.controller;
 
+import com.yaniv.bookshelf.dto.OrderedBookDto;
 import com.yaniv.bookshelf.mapper.CartMapper;
 import com.yaniv.bookshelf.mapper.OrderedBookMapper;
 import com.yaniv.bookshelf.model.Invoice;
@@ -13,14 +14,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.Principal;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cart")
@@ -77,7 +84,9 @@ public class InvoiceController {
         ModelAndView modelAndView = new ModelAndView("cart");
         Map<String, Integer> cart = cartMapper.toMap(invoice);
         Set<String> cartElect = cartMapper.toSet(elVersion);
-        Set<OrderedBook> books = orderedBookMapper.merge(cart, cartElect);
+        Set<OrderedBook> orderedBooks = orderedBookMapper.merge(cart, cartElect);
+        Set<OrderedBookDto> books = orderedBooks.stream()
+                .map(orderedBookMapper::toDto).collect(Collectors.toSet());
         modelAndView.addObject("books", books);
         return modelAndView;
     }

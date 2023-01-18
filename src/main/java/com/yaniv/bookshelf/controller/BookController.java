@@ -13,7 +13,6 @@ import com.yaniv.bookshelf.service.AuthorService;
 import com.yaniv.bookshelf.service.BookService;
 import com.yaniv.bookshelf.service.VisitorService;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import javax.activation.MimetypesFileTypeMap;
+import java.io.ByteArrayInputStream;
 import java.security.Principal;
 import java.util.*;
 
@@ -61,7 +59,9 @@ public class BookController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Optional<Visitor> visitor = visitorService.findByEmail(authentication.getName());
             ModelAndView modelAndView = new ModelAndView("book_detail");
-            modelAndView.addObject("book", BookMapper.toDto(book));
+            BookDto dto = BookMapper.toDto(book, bookService.getBookCover(book.getIsbn()));
+
+            modelAndView.addObject("book", dto);
             if (visitor.isPresent()) {
                 modelAndView.addObject("isDownload", bookService.findElectronicByUserIdAndIsbn(visitor.get().getId(), isbn).isPresent());
                 modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));
@@ -73,30 +73,12 @@ public class BookController {
         }
     }
 
-    @GetMapping("/edit")
+    @GetMapping("/update")
     @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView editBook(@RequestParam String isbn) {
-        Optional<Book> optionalBook = bookService.findById(isbn);
-        if (optionalBook.isEmpty()) {
-            return new ModelAndView("forward:/");
-        } else {
-            ModelAndView modelAndView = new ModelAndView("book_edit");
-            LOGGER.debug("book to edit - {}", optionalBook.get());
-            modelAndView.addObject("bookdto", BookMapper.toDto(optionalBook.get()));
-            modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
-            Author author = new Author();
-            author.setId(UUID.randomUUID().toString());
-            modelAndView.addObject("author", author);
-            modelAndView.addObject("authors", authorService.getAllSorted());
-            return modelAndView;
-        }
-    }
-
-    @GetMapping("/create")
-    @PreAuthorize("hasAuthority('book:write')")
-    public ModelAndView createBook() {
+        Book book = bookService.findById(isbn).orElseGet(Book::new);
         ModelAndView modelAndView = new ModelAndView("book_edit");
-        modelAndView.addObject("bookdto", BookMapper.toDto(new Book()));
+        modelAndView.addObject("bookdto", BookMapper.toDto(book, null));
         modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
         Author author = new Author();
         author.setId(UUID.randomUUID().toString());
@@ -107,22 +89,17 @@ public class BookController {
 
 
     @SneakyThrows
-    @PostMapping("/edit")
+    @PostMapping("/update")
     @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
-        if (bookdto.getBook().isEmpty() && StringUtils.isBlank(bookdto.getBookUrl())) {
-            LOGGER.info("Can't edit'");
-            ModelAndView infoModel = new ModelAndView("information");
-            infoModel.addObject("info", "Data not valid, check electronic book");
-            return infoModel;
-        }
+        bookService.setBookFiles(book, bookdto.getCoverMultipart(), bookdto.getBookMultipart());
         bookService.save(book);
         return editBook(book.getIsbn());
     }
 
     @GetMapping("/filter")
-    public ModelAndView ajaxFilter(@RequestParam String name, @RequestParam int page) {
+    public ModelAndView filterNameAjax(@RequestParam String name, @RequestParam int page) {
         LOGGER.debug("ajaxFilter method was called for-{}", name);
         LOGGER.debug("Books-{}", bookService.findByNameLike(name, page));
         LOGGER.debug("page-{}", page);
@@ -135,7 +112,7 @@ public class BookController {
     }
 
     @GetMapping("/getFilterBy")
-    public ModelAndView getFilterBy(@ModelAttribute FilterDto filterDto) {
+    public ModelAndView filterDtoAjax(@ModelAttribute FilterDto filterDto) {
         LOGGER.debug("filter in getFilterBy: {}", filterDto);
         List<Book> books = bookService.filterBook(filterDto);
         if (books.isEmpty()) {
@@ -147,7 +124,6 @@ public class BookController {
 
     @GetMapping("/get-by-user")
     public ModelAndView getBooksByUser(Principal principal, @RequestParam int page) {
-        LOGGER.debug("get-by-user {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         Page<Book> bookPage = bookService.findByUser(visitor.getId(), page);
         if ((bookPage.getTotalPages() - 1 < page) && (bookPage.getTotalPages() != 0)) {
@@ -169,32 +145,32 @@ public class BookController {
         return bookSelectionModelCreator(bookPage, page, bookService);
     }
 
-    @GetMapping("/download")
-    public ResponseEntity<Object> downloadFile(@RequestParam String isbn, Principal principal) throws FileNotFoundException {
-        String filename = Thread.currentThread().getContextClassLoader()
-                .getResource("static/book/" + bookService.findElectronicByUserIdAndIsbn(
-                        visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getId(),
-                        isbn).orElse(new Book()).getBookUrl()).getPath();
-
-        File file = new File(filename);
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+    @GetMapping("/drive")
+    public ResponseEntity<Object> downloadDrive(@RequestParam String isbn, Principal principal) {
+        Book book = bookService.findElectronicByUserIdAndIsbn(
+                        visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getId(), isbn).
+                orElseGet(Book::new);
+        byte[] file = bookService.getBookFile(isbn);
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition",
-                String.format("attachment; filename=\"%s\"", file.getName()));
+                String.format("attachment; filename=\"%s\"", book.getBookUrl()));
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
-
         return ResponseEntity.ok().headers(headers)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/txt")).body(resource);
+                .contentLength(file.length)
+                .contentType(MediaType.parseMediaType(
+                        new MimetypesFileTypeMap().getContentType(book.getBookUrl())))
+                .body(resource);
     }
 
     public static ModelAndView bookSelectionModelCreator(Iterable<Book> books, int page, BookService bookService) {
         ModelAndView model = new ModelAndView("fragment/book_selection");
         List<BookReviewDto> bookReview = new ArrayList<>();
-        books.forEach(book -> bookReview.add(
-                BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn()))));
+        books.forEach(book -> bookReview.add(BookReviewMapper.toDto(book,
+                bookService.getAvgByBook(book.getIsbn()),
+                bookService.getBookCover(book.getIsbn()))));
         model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;

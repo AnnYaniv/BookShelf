@@ -30,9 +30,9 @@ public class MainController {
         modelAndView.addObject("filterDto", filterDto);
         List<BookReviewDto> bookReview = new ArrayList<>();
         bookService.getAll(0).forEach(book ->
-                bookReview.add(
-                        BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn())
-                        )));
+                bookReview.add(BookReviewMapper.toDto(book,
+                        bookService.getAvgByBook(book.getIsbn()),
+                        bookService.getBookCover(book.getIsbn()))));
         modelAndView.addObject("books", bookReview);
         modelAndView.addObject("page",0);
         return modelAndView;

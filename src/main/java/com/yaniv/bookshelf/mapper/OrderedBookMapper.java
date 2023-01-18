@@ -1,5 +1,6 @@
 package com.yaniv.bookshelf.mapper;
 
+import com.yaniv.bookshelf.dto.OrderedBookDto;
 import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.OrderedBook;
 import com.yaniv.bookshelf.model.enums.BookType;
@@ -43,5 +44,11 @@ public class OrderedBookMapper {
             }
         }
         return books;
+    }
+
+    public OrderedBookDto toDto(OrderedBook orderedBook) {
+        return new OrderedBookDto(orderedBook.getId(), orderedBook.getBook(),
+                orderedBook.getQuantity(), orderedBook.getPrice(), orderedBook.getBookType(),
+                bookService.getBookCover(orderedBook.getBook().getIsbn()));
     }
 }

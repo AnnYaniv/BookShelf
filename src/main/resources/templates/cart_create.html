@@ -19,8 +19,9 @@
             <div class="col col-5">Quantity</div>
         </li>
         <li class="table-row" th:each="book : ${books}">
-            <div class="col col-1" data-label="Book name" th:text="${book.book.name}">book name</div>
-            <div class="col col-2" data-label="Author" th:text="${#strings.listJoin(book.book.author,',')}">author</div>
+            <div class="col col-1" data-label="Book name" th:text="${book.book.title}">book name</div>
+            <div class="col col-2" data-label="Author" th:text="${#strings.listJoin(book.book.authors,',')}">author
+            </div>
             <div class="col col-3" data-label="Book type" th:text="${book.bookType}">ELECTRONIC</div>
             <div class="col col-4" data-label="Price" th:text="${book.price}">200</div>
             <div class="col col-5" data-label="Quantity" th:text="${book.quantity}">1</div>

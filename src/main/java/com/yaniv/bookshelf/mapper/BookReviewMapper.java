@@ -7,8 +7,8 @@ public class BookReviewMapper {
     private BookReviewMapper() {
     }
 
-    public static BookReviewDto mapToDto(Book book, double mark) {
-        return new BookReviewDto(book.getCover(), book.getName(),
-                book.getPrice(), book.getAuthor(), book.getGenre(), book.getIsbn(), mark);
+    public static BookReviewDto toDto(Book book, double mark, String cover) {
+        return new BookReviewDto(book.getIsbn(), book.getTitle(), cover,
+                book.getPrice(), mark, book.getAuthors(), book.getGenre());
     }
 }

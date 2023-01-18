@@ -1,10 +1,10 @@
 <div class="col-md-6 col-lg-4 mb-4 mb-md-0">
     <div class="card text-black" th:fragment="card">
-        <img th:src="@{${(book.cover != null && !#strings.isEmpty(book.cover)) ? '/covers/' + book.cover : '/covers/no_cover.png'}}"
+        <img th:src="${'data:image/jpeg;charset=utf-8;base64,' + book.coverByte}"
              class="card-img-top"/>
         <div class="card-body">
             <div class="text-center mt-1">
-                <h4 class="card-title" th:text="${book.name}"></h4>
+                <h4 class="card-title" th:text="${book.title}"></h4>
                 <h6 class="text-primary mb-1 pb-3" th:text="${'Price: '+ book.price }">
                 </h6>
             </div>
@@ -28,9 +28,9 @@
             <br>
             <div class="text-center">
                 <div class="p-3 mx-n3 mb-4" style="background-color: #eff1f2;">
-                    <h5 th:if="${#lists.isEmpty(book.author)}" class="mb-0">none</h5>
-                    <h5 th:unless="${#lists.isEmpty(book.author)}" class="mb-0"
-                        th:text="${#strings.listJoin(book.author, ', ')}"></h5>
+                    <h5 th:if="${#lists.isEmpty(book.authors)}" class="mb-0">none</h5>
+                    <h5 th:unless="${#lists.isEmpty(book.authors)}" class="mb-0"
+                        th:text="${#strings.listJoin(book.authors, ', ')}"></h5>
                 </div>
 
                 <div class="d-flex flex-row justify-content-center">
@@ -77,12 +77,12 @@
 <div class="card-body p-4" th:fragment="card_cart">
     <div class="row d-flex align-items-center">
         <div class="col-md-2 col-lg-2 col-xl-2">
-            <img th:src="@{${(book.book.cover != null && !#strings.isEmpty(book.book.cover)) ? '/covers/' + book.book.cover : '/covers/no_cover.png'}}"
-                 class="img-fluid rounded-3" alt="Cotton T-shirt">
+            <img th:src="${'data:image/jpeg;charset=utf-8;base64,' + book.coverByte}"
+                 class="img-fluid rounded-3"/>
         </div>
         <div class="col-md-3 col-lg-3 col-xl-3">
-            <p class="lead fw-normal mb-2" th:text="${book.book.name}"></p>
-            <p><span class="text-muted" th:text="'Authors: ' + ${#strings.arrayJoin(book.book.author,',')}"> </span>
+            <p class="lead fw-normal mb-2" th:text="${book.book.title}"></p>
+            <p><span class="text-muted" th:text="'Authors: ' + ${#strings.arrayJoin(book.book.authors,',')}"> </span>
                 <span class="text-muted" th:text="${book.book.isbn}"> </span></p>
         </div>
         <div th:if="${#strings.toString(book.bookType) == 'PAPER'}" class="col-md-3 col-lg-3 col-xl-2 d-flex">
@@ -127,21 +127,13 @@
                 <article class="gallery-wrap">
                     <div class="img-big-wrap">
                         <td><img th:src="${'data:image/jpeg;charset=utf-8;base64,' + book.coverByte}"
-                                 style="max-width:100%;max-height:100%" alt="oi"></td>
-<!--                        "${'data:image/jpeg;charset=utf-8;base64,' + bottle.image}"-->
-<!--                        <div th:if="${book.cover != null}">-->
-<!--                            <img th:src="@{${(book.cover != null && !#strings.isEmpty(book.cover)) ? '/covers/' + book.cover : '/covers/no_cover.png'}}"-->
-<!--                                 style="max-width:100%;max-height:100%" alt="non-nulll"/>-->
-<!--                        </div>-->
-<!--                        <div th:unless="${book.cover != null}">-->
-<!--                            <img src="/covers/no_cover.png" style="max-width:100%;max-height:100%" alt="nulll"/>-->
-<!--                        </div>-->
+                                 style="max-width:100%;max-height:100%" alt="oi"/></td>
                     </div>
                 </article>
             </aside>
             <aside class="col-sm-7">
                 <article class="card-body p-5">
-                    <h3 class="title mb-3" th:text="${book.name}">
+                    <h3 class="title mb-3" th:text="${book.title}">
                         <small class="text-muted" th:text="${#strings.listJoin(book.author,',')} "></small>
                     </h3>
 
@@ -204,7 +196,7 @@
                        th:attr="onclick=|addElectronicVersionToCart('${book.isbn}')|">to cart</a>
                     <a sec:authorize="hasAuthority('book:write')" th:href="@{/book/edit(isbn=${book.isbn})}"
                        class="btn btn-lg btn-warning text-uppercase">update</a>
-                    <a th:if="${isDownload}" th:href="@{/book/download(isbn=${book.isbn})}"
+                    <a th:if="${isDownload}" th:href="@{/book/drive(isbn=${book.isbn})}"
                        class="btn btn-lg btn-success text-uppercase">download</a>
                 </article>
             </aside>

@@ -8,11 +8,11 @@ import java.util.Set;
 
 @Value
 public class BookReviewDto {
-    String cover;
-    String name;
-    double price;
-    Set<Author> author;
-    Set<Genre> genre;
     String isbn;
+    String title;
+    String coverByte;
+    double price;
     double mark;
+    Set<Author> authors;
+    Set<Genre> genre;
 }

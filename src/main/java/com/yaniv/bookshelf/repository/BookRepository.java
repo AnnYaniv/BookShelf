@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, String> {
     Optional<Book> findByIsbn(String s);
 
-    @Query("select book from Book book where book.name like concat('%', :bookName, '%')")
+    @Query("select book from Book book where book.title like concat('%', :bookName, '%')")
     Page<Book> findByNameLike(@Param("bookName") String name, Pageable pageable);
 
     @Query("select distinct book from Invoice inv join inv.buyer visitor " +

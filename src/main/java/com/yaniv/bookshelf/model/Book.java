@@ -27,15 +27,15 @@ public class Book{
     private String isbn;
 
     @NotBlank
-    private String name;
+    private String title;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_author",
-            joinColumns = { @JoinColumn(name = "book_isbn", referencedColumnName="isbn") },
-            inverseJoinColumns = { @JoinColumn(name = "author_id", referencedColumnName="id")}
+            joinColumns = {@JoinColumn(name = "book_isbn", referencedColumnName = "isbn")},
+            inverseJoinColumns = {@JoinColumn(name = "author_id", referencedColumnName = "id")}
     )
-    private Set<Author> author = new LinkedHashSet<>();
+    private Set<Author> authors = new LinkedHashSet<>();
 
     @Type(type="text")
     private String annotation;
@@ -54,7 +54,7 @@ public class Book{
     private double price;
     private int visited;
 
-    private String cover;
+    private String coverUrl;
 
     @NotBlank
     private String bookUrl;
@@ -72,7 +72,7 @@ public class Book{
     }
 
     public void addAuthor(Author author) {
-        this.author.add(author);
+        this.authors.add(author);
     }
 
 }

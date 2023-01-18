@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/favourite")
@@ -46,7 +49,9 @@ public class FavouriteController {
             Iterable<Book> books = favouriteService.getBooks(0, favouriteId);
             ModelAndView modelAndView = new ModelAndView("favourite");
             List<BookReviewDto> bookReview = new ArrayList<>();
-            books.forEach(book -> bookReview.add(BookReviewMapper.mapToDto(book, bookService.getAvgByBook(book.getIsbn()))));
+            books.forEach(book -> bookReview.add(BookReviewMapper.toDto(book,
+                    bookService.getAvgByBook(book.getIsbn()),
+                    bookService.getBookCover(book.getIsbn()))));
             modelAndView.addObject("books", bookReview);
             modelAndView.addObject("page", 0);
             return modelAndView;

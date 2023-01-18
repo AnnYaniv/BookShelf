@@ -2,7 +2,10 @@ package com.yaniv.bookshelf.dto;
 
 import com.yaniv.bookshelf.dto.enums.Sort;
 import com.yaniv.bookshelf.model.enums.Genre;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -15,7 +18,6 @@ public class FilterDto {
     Double max;
     Sort sort;
     List<Genre> genre;
-
     Integer page;
 
     @Override

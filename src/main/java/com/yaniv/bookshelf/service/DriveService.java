@@ -56,9 +56,10 @@ public class DriveService {
     public List<File> getFiles() {
         FileList files = service.files().list()
                 .setFields("nextPageToken, files(id, name, parents)")
-                .setPageSize(10).execute();
+                .execute();
         for (File file : files.getFiles()) {
-            LOGGER.info("Found file: {} ({})", file.getName(), file.getId());
+            LOGGER.info("Found file: {} ({}), folder={}", file.getName(), file.getId(),
+                    (file.getParents() == null) ? "null" : file.getParents().get(0));
         }
         return files.getFiles();
     }

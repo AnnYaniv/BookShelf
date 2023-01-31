@@ -83,7 +83,7 @@ public class BookService {
     public String getBookCover(String isbn) {
         Book book = bookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new IllegalArgumentException("Book with isbn=" + isbn + " dont exist"));
-        return Base64.getEncoder().encodeToString(driveService.download(book.getCoverUrl(), DriveService.Folder.COVER).toByteArray());
+        return Base64.getEncoder().encodeToString(driveService.downloadById(book.getCoverUrl()).toByteArray());
     }
 
     public byte[] getBookFile(String isbn) {

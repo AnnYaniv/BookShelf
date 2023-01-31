@@ -104,6 +104,12 @@ public class DriveService {
         }
     }
 
+    @SneakyThrows
+    public ByteArrayOutputStream downloadById(String id) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        service.files().get(id).executeMediaAndDownloadTo(outputStream);
+        return outputStream;
+    }
 
     @SneakyThrows
     private byte[] compressImage(MultipartFile mpFile) {

@@ -3,9 +3,10 @@ package com.yaniv.bookshelf.controller.api;
 import com.yaniv.bookshelf.dto.BookReviewDto;
 import com.yaniv.bookshelf.mapper.BookReviewMapper;
 import com.yaniv.bookshelf.model.Book;
-import com.yaniv.bookshelf.service.AuthorService;
 import com.yaniv.bookshelf.service.BookService;
-import com.yaniv.bookshelf.service.VisitorService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +18,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/book")
 public class BookControllerApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookControllerApi.class);
     private final BookService bookService;
-    private final AuthorService authorService;
-    private final VisitorService visitorService;
 
     @Autowired
-    public BookControllerApi(BookService bookService, AuthorService authorService, VisitorService visitorService) {
+    public BookControllerApi(BookService bookService) {
         this.bookService = bookService;
-        this.authorService = authorService;
-        this.visitorService = visitorService;
     }
 
     @GetMapping
@@ -49,6 +47,8 @@ public class BookControllerApi {
 
     @GetMapping("/cover")
     public String getCover(@RequestParam String isbn) {
-        return bookService.getBookCover(isbn);
+        String cover = bookService.getBookCover(isbn);
+        LOGGER.info("Isbn - {}, is null - {}", isbn, StringUtils.isBlank(cover));
+        return cover;
     }
 }

@@ -2,22 +2,20 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <meta charset="UTF-8">
     <title>Your page</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
-          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/css/book_card.css">
+
+    <script src="https://kit.fontawesome.com/1c103036b2.js" crossorigin="anonymous"></script>
     <script src="script/clean_cart.js"></script>
     <style>
-        .card-img-top {
-            width: 100%;
-            height: 20vw;
-            object-fit: cover;
-        }
-
         html, body {
             height: 100%;
         }
@@ -28,45 +26,45 @@
     </style>
 </head>
 <body onload="clean()">
-<header th:replace="fragment/header :: header"></header>
+<header th:replace="fragment/header :: header" ></header>
 <div class="main h-100 d-flex flex-column">
     <div class="container-fluid d-flex flex-fill">
         <div class="row flex-fill">
-            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark">
+            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark" style="box-shadow: 1px 1px 1px 1px white;">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a id="dashboard" href="#" class="nav-link text-white">
-                            Dashboard
+                        <a id="dashboard" href="#" class="nav-link text-white" onclick="selected_change('dashboard')">
+                            <i class="fa-solid fa-table-columns" style="color: #ffffff;"></i> Dashboard
+                        </a>
+                    </li>
+                    <li >
+                        <a id="invoices" href="#" class="nav-link text-white" onclick="selected_change('invoices')">
+                            <i class="fa-solid fa-receipt" style="color: #ffffff;"></i> Orders
                         </a>
                     </li>
                     <li>
-                        <a id="invoices"  href="#" class="nav-link text-white">
-                            Orders
+                        <a id="products" href="#" class="nav-link text-white" onclick="selected_change('products')">
+                            <i class="fa-solid fa-book" style="color: #ffffff;"></i> Products
                         </a>
                     </li>
                     <li>
-                        <a id="products" href="#" class="nav-link text-white">
-                            Products
-                        </a>
-                    </li>
-                    <li>
-                        <a id="available" href="#" class="nav-link text-white">
-                            Available for download
+                        <a id="available" href="#" class="nav-link text-white" onclick="selected_change('available')">
+                            <i class="fa-solid fa-file-arrow-down" style="color: #ffffff;"></i> Available for download
                         </a>
                     </li>
                     <li sec:authorize="hasAuthority('author:write')">
-                        <a id="authors" href="/author" class="nav-link text-white">
-                            Authors
+                        <a id="authors" href="/author" class="nav-link text-white" onclick="selected_change('authors')">
+                            <i class="fa-solid fa-feather-pointed" style="color: #ffffff;"></i> Authors
                         </a>
                     </li>
                     <li sec:authorize="hasAuthority('book:write')">
-                        <a id="new_book" href="/book/update?isbn=-110" class="nav-link text-white">
-                            Create book
+                        <a id="new_book" href="#" class="nav-link text-white" onclick="selected_change('new_book')">
+                            <i class="fa-solid fa-file-circle-plus" style="color: #ffffff;"></i> Add book
                         </a>
                     </li>
-                    <li sec:authorize="hasAuthority('book:write')">
-                        <a id="orders" href="/book/create" class="nav-link text-white">
-                            Manage orders
+                    <li sec:authorize="hasAuthority('book:write')" >
+                        <a id="orders" href="/book/create" class="nav-link text-white" onclick="selected_change('orders')">
+                            <i class="fa-solid fa-file-invoice" style="color: #ffffff;"></i> Manage orders
                         </a>
                     </li>
                 </ul>
@@ -81,5 +79,23 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
 <script src="/script/user.js"></script>
 <script src="/script/invoice.js"></script>
+<script>
+    function selected_change(id){
+        console.log("id - " + id);
+        const active = document.getElementsByClassName("active");
+
+        console.log("selected - " + active.length);
+        for (let i = 0; i < active.length; i++) {
+            active[i].classList.add("text-white");
+            active[i].classList.remove("active");
+        }
+
+        var new_active = document.getElementById(id);
+        new_active.classList.add("active");
+        new_active.classList.remove("text-white");
+    }
+
+
+</script>
 </body>
 </html>

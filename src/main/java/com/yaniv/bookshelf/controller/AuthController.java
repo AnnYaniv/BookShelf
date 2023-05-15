@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/auth")
@@ -28,14 +29,16 @@ public class AuthController {
     }
 
     @PostMapping
-    public String newUser(@ModelAttribute VisitorDto visitorDto){
+    public RedirectView newUser(@ModelAttribute VisitorDto visitorDto){
+        LOGGER.info("Dto: {}",visitorDto);
         boolean isExist = visitorService.findByEmail(visitorDto.getEmail()).isPresent();
         boolean isValid = VisitorValidator.isValid(visitorDto);
 
         if(!isExist && isValid) {
-            LOGGER.info("New user {}", visitorService.save(VisitorMapper.toUser(visitorDto)));
+            LOGGER.info("New user {}; saving is disabled!", VisitorMapper.toUser(visitorDto));
+//            LOGGER.info("New user {}", visitorService.save(VisitorMapper.toUser(visitorDto)));
         }
-        return visitorDto + " ,ex: " + isExist + " ,val: " + isValid;
+        return new RedirectView("/user");
     }
 
     @GetMapping("/login")

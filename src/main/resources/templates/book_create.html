@@ -17,7 +17,6 @@
 </head>
 <body>
 
-<header th:replace="fragment/header :: header"></header>
 <div class="container py-5">
     <form class="not-validated" th:action="@{/book/update}" th:object="${bookdto}" method="post"
           enctype="multipart/form-data">
@@ -116,7 +115,7 @@
         <div class="form-group row">
             <div class="col-md-4 mb-3">
                 <button class="btn btn-success text-uppercase" type="submit" formmethod="post" value="Upload">
-                    Update
+                    Create
                 </button>
             </div>
             <div class="col-md-4 mb-3">
@@ -128,15 +127,5 @@
     </form>
 </div>
 
-<script>
-    $(".custom-file-input").on("change", function () {
-        var fileName = $(this).val().split("\\").pop();
-        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-    });
-</script>
-
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
 </body>
 </html>

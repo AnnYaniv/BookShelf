@@ -74,6 +74,23 @@ $(function () {
     })
 });
 
+
+$(function () {
+    $('#new_book').on('click', function (e) {
+        $.ajax({
+            type: "GET",
+            url: "/book/create",
+            success: function (data, textStatus, jQxhr) {
+                $('#data-container').html(data);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    })
+});
+
+
 $(function () {
     $('#products').on('click', function (e) {
         $.ajax({

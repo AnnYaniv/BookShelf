@@ -30,7 +30,7 @@ public class VisitorMapper {
     public static Visitor toUser(VisitorDto visitorDto){
         Visitor user = new Visitor();
         toVisitor(visitorDto, user);
-        if(!StringUtils.isBlank(user.getUserName())){
+        if(StringUtils.isBlank(user.getUserName())){
             Matcher matcher = Pattern.compile("^(.+)@(\\S+)$").matcher(user.getEmail());
             if(matcher.find()){
                 user.setUserName(matcher.group(0));

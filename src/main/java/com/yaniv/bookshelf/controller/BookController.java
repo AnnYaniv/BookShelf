@@ -87,6 +87,20 @@ public class BookController {
         return modelAndView;
     }
 
+    @GetMapping("/create")
+    @PreAuthorize("hasAuthority('book:write')")
+    public ModelAndView createBook(){
+        Book book = new Book();
+        ModelAndView modelAndView = new ModelAndView("book_create");
+        modelAndView.addObject("bookdto", BookMapper.toDto(book, null));
+        modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
+        Author author = new Author();
+        author.setId(UUID.randomUUID().toString());
+        modelAndView.addObject("author", author);
+        modelAndView.addObject("authors", authorService.getAllSorted());
+        return modelAndView;
+    }
+
 
     @SneakyThrows
     @PostMapping("/update")

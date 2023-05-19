@@ -7,6 +7,7 @@ public class AuthorMapper {
     private AuthorMapper() {}
     public static Author toAuthor(AuthorDto authorDto){
         Author author = new Author();
+        author.setId(authorDto.getId());
         author.setFirstName(authorDto.getFirstName());
         author.setLastName(authorDto.getLastName());
         return author;

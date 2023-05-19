@@ -1,4 +1,4 @@
-function onPageFilter(page) {
+function getPage(page) {
     $.ajax({
         type: "GET",
         url: "/book/get-by-user",
@@ -6,7 +6,7 @@ function onPageFilter(page) {
         success: function (data, textStatus, jQxhr) {
             console.log("pageable products " + 1);
             $('#data-container').html(data +
-            "<script src=\"script/products_all.js\"></script>");
+            "<script src=\"script/pageable_books_user.js\"></script>");
         },
         error: function (jqXhr, textStatus, errorThrown) {
             console.log(errorThrown);

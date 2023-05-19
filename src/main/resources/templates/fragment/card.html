@@ -1,45 +1,42 @@
 <div class="col-md-6 col-lg-4 mb-4 mb-md-0">
     <div class="card text-black" th:fragment="card">
-        <img th:id="${book.isbn}" src="no_cover.png" class="card-img-top"/>
+        <img th:id="${book.isbn}" src="no_cover.png" class="card-img-top downloadable"/>
         <div class="card-body">
             <div class="text-center mt-1">
                 <h4 class="card-title" th:text="${book.title}"></h4>
-                <h6 class="text-primary mb-1 pb-3" th:text="${'Price: '+ book.price }">
+                <h6 class="text-primary mb-1 pb-2" th:text="${'Price: '+ book.price }">
                 </h6>
             </div>
-            <div class="text-center mt-1">
-                <a th:if="${book.mark > 0}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
-                <a th:unless="${book.mark > 0}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+            <div class="text-center mt-1 mb-2">
+                <i th:if="${book.mark > 0}" class="fa-solid fa-star fa-2x"></i>
+                <i th:unless="${book.mark > 0}" class="fa-regular fa-star fa-2x"></i>
 
-                <a th:if="${book.mark > 1}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
-                <a th:unless="${book.mark > 1}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+                <i th:if="${book.mark > 1}" class="fa-solid fa-star fa-2x"></i>
+                <i th:unless="${book.mark > 1}" class="fa-regular fa-star fa-2x"></i>
 
-                <a th:if="${book.mark > 2}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
-                <a th:unless="${book.mark > 2}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+                <i th:if="${book.mark > 2}" class="fa-solid fa-star fa-2x"></i>
+                <i th:unless="${book.mark > 2}" class="fa-regular fa-star fa-2x"></i>
 
-                <a th:if="${book.mark > 3}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
-                <a th:unless="${book.mark > 3}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+                <i th:if="${book.mark > 3}" class="fa-solid fa-star fa-2x"></i>
+                <i th:unless="${book.mark > 3}" class="fa-regular fa-star fa-2x"></i>
 
-                <a th:if="${book.mark > 4}" href="#"><i class="fa-solid fa-star fa-2x"></i></a>
-                <a th:unless="${book.mark > 4}" href="#"><i class="fa-regular fa-star fa-2x"></i></a>
+                <i th:if="${book.mark > 4}" class="fa-solid fa-star fa-2x"></i>
+                <i th:unless="${book.mark > 4}" class="fa-regular fa-star fa-2x"></i>
             </div>
-            <br>
             <div class="text-center">
-                <div class="p-3 mx-n3 mb-4" style="background-color: #eff1f2;">
+                <div class="p-3 mx-n3 mb-2" style="background-color: #eff1f2;">
                     <h5 th:if="${#lists.isEmpty(book.authors)}" class="mb-0">none</h5>
                     <h5 th:unless="${#lists.isEmpty(book.authors)}" class="mb-0"
                         th:text="${#strings.listJoin(book.authors, ', ')}"></h5>
                 </div>
-
                 <div class="d-flex flex-row justify-content-center">
-                    <p class="small mr-auto p-2" th:each="genre_ : ${book.genre}">
+                    <p class="small mr-auto p-1" th:each="genre_ : ${book.genre}">
                         <a href="#" class="text-muted" th:text="${genre_}">Genres</a>
                     </p>
                 </div>
-
                 <div class="d-flex flex-row">
                     <a th:href="@{/book(isbn=${book.isbn})}">
-                        <button type="button" class="btn btn-info flex-fill me-1" data-mdb-ripple-color="dark">
+                        <button type="button" class="btn btn-outline-dark flex-fill me-1">
                             Learn more
                         </button>
                     </a>
@@ -115,90 +112,7 @@
     </div>
 </div>
 
-<div class="container" th:fragment="big_card">
-    <br>
-    <div class="card">
-        <div class="row">
-            <aside class="col-sm-5 border-right">
-                <article class="gallery-wrap">
-                    <div class="img-big-wrap">
-                        <td><img th:src="${'data:image/jpeg;charset=utf-8;base64,' + book.coverByte}"
-                                 style="max-width:100%;max-height:100%" alt="oi"/></td>
-                    </div>
-                </article>
-            </aside>
-            <aside class="col-sm-7">
-                <article class="card-body p-5">
-                    <h3 class="title mb-3" th:text="${book.title}">
-                        <small class="text-muted" th:text="${#strings.listJoin(book.author,',')} "></small>
-                    </h3>
 
-                    <p class="price-detail-wrap">
-	                    <span class="price h3 text-warning">
-		                <span class="currency">Price: </span>
-                        <span class="num" th:text="${book.price}"></span>
-	                    </span>
-                    </p> <!-- price-detail-wrap .// -->
-                    <dl class="item-property">
-                        <dt>Description</dt>
-                        <dd><p th:text="${book.annotation}"></p></dd>
-                    </dl>
-                    <dl class="row">
-                        <dt class="col-sm-3">In shop</dt>
-                        <dd class="col-sm-5" th:text="${book.count}"></dd>
-                    </dl>
-                    <dl class="row">
-                        <dt class="col-sm-3">Year</dt>
-                        <dd class="col-sm-5" th:text="${book.year}"></dd>
-                    </dl>  <!-- item-property-hor .// -->
-                    <dl class="row">
-                        <dt class="col-sm-3">Genre:</dt>
-                        <dd class="col-sm-5" th:text="${#strings.listJoin(book.genre,',')}"></dd>
-                    </dl>  <!-- item-property-hor .// -->
-                    <dl class="row">
-                        <dt class="col-sm-3">Publishing house</dt>
-                        <dd class="col-sm-5" th:text="${book.publishingHouse}"></dd>
-                    </dl>  <!-- item-property-hor .// -->
-                    <dl class="row">
-                        <dt class="col-sm-3">ISBN</dt>
-                        <dd class="col-sm-5" th:text="${book.isbn}" id="isbn-label"></dd>
-                    </dl>  <!-- item-property-hor .// -->
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-7">
-                            <dl class="param param-inline">
-                                <dt>Version:</dt>
-                                <dd>
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="version"
-                                               id="inlineRadio1" value="PAPER" checked>
-                                        <span class="form-check-label">Paper version</span>
-                                    </label>
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="version"
-                                               id="inlineRadio2" value="ELECTRONIC">
-                                        <span class="form-check-label">Electronic version</span>
-                                    </label>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                    <hr>
-                    <a href="#" id="fav-a">
-                        <button id="fav-btn" name="fav-btn" class="btn btn-lg btn-dark text-uppercase">to favourite
-                        </button>
-                    </a>
-                    <a href="#" class="btn btn-lg btn-outline-dark text-uppercase"
-                       th:attr="onclick=|addElectronicVersionToCart('${book.isbn}')|">to cart</a>
-                    <a sec:authorize="hasAuthority('book:write')" th:href="@{/book/edit(isbn=${book.isbn})}"
-                       class="btn btn-lg btn-warning text-uppercase">update</a>
-                    <a th:if="${isDownload}" th:href="@{/book/drive(isbn=${book.isbn})}"
-                       class="btn btn-lg btn-success text-uppercase">download</a>
-                </article>
-            </aside>
-        </div>
-    </div>
-</div>
 
 <div class="card rounded-3 mb-4">
     <div class="card-body p-4" th:fragment="card_review">

@@ -40,7 +40,7 @@ function star_click(mark) {
     }
 }
 
-function onPageFilter(page) {
+function getPage(page) {
         var filterDto = JSON.parse($('#filter_input').text());
         filterDto.page = page;
         console.log(filterDto);
@@ -48,8 +48,7 @@ function onPageFilter(page) {
         $.ajax({
             type: "GET",
             url: "/review/all",
-            data: {
-                isbn: isbn,
+            data: { isbn: isbn,
                 page: page},
             success: function (data, textStatus, jQxhr) {
                 $('#review-container').html(data);

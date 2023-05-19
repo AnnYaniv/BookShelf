@@ -1,4 +1,4 @@
-function onPageFilter(page) {
+function getPage(page) {
     $.ajax({
         type: "GET",
         url: "/author/pageable",
@@ -14,9 +14,9 @@ function onPageFilter(page) {
 }
 
 function setId(id, name, lastName) {
-    document.getElementById("authorId").value = id;
-    document.getElementById("name").value = name;
-    document.getElementById("l_name").value = lastName;
+    document.getElementById("id").value = id;
+    document.getElementById("firstName").value = name;
+    document.getElementById("lastName").value = lastName;
 }
 
 $('#search-input').change(function () {
@@ -30,3 +30,34 @@ $('#search-input').change(function () {
         }
     });
 });
+
+(function () {
+
+    var forms = document.getElementsByClassName('not-validated');
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const data ={
+                    id: $('#id').val(),
+                    firstName: $('#firstName').val(),
+                    lastName: $('#lastName').val()
+                }
+                console.log("To send - " + data);
+                $.ajax({
+                    url: '/author',
+                    method: "POST",
+                    data: data,
+                    success: function(data) {
+                        console.log(data)
+                        $('#data-container').html(data);
+                    },
+                    error: function (jqXhr, textStatus, errorThrown){
+                        console.log("Error " + errorThrown)
+                        console.log(errorThrown)
+                    }
+                });
+            }, false)
+        })
+})()

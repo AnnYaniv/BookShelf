@@ -13,7 +13,7 @@
 
             <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                 <input id="search-input" type="search" class="form-control form-control-dark" placeholder="Search..."
-                       aria-label="Search">
+                       aria-label="Search" onchange="onSearchChange()">
             </form>
 
             <div class="text-end" sec:authorize="!isAuthenticated()">

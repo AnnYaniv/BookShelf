@@ -1,16 +1,15 @@
 function getPage(page) {
     $.ajax({
         type: "GET",
-        url: "/cart/all",
+        url: "/pageable",
         data: {page: page},
-        success: function (data, textStatus, jQxhr) {
-            console.log("pageable products " + 1);
+        success: function (data) {
+            console.log("get by name " + page);
             $('#data-container').html(data +
-                "<script src=\"script/orders_all.js\"></script>");
+                "<script src=\"script/pageable_books.js\"></script>");
         },
         error: function (jqXhr, textStatus, errorThrown) {
             console.log(errorThrown);
         }
     });
 }
-

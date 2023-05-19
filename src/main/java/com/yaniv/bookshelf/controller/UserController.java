@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/about")
     public ModelAndView getInfoById(Principal principal) {
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
-        ModelAndView model = new ModelAndView("fragment/user_update");
+        ModelAndView model = new ModelAndView("fragment/user_about");
         model.addObject("visitor", visitor);
         model.addObject("additionInfo", "");
         return model;
@@ -42,7 +42,7 @@ public class UserController {
         LOGGER.debug("post /user/about");
         Visitor visitor = visitorService.save(VisitorMapper.toVisitor(visitorDto,
                 visitorService.findByEmail(principal.getName()).orElse(new Visitor())));
-        ModelAndView model = new ModelAndView("fragment/user_update");
+        ModelAndView model = new ModelAndView("user_about");
         model.addObject("visitor", visitor);
         model.addObject("additionInfo", "Updated successfully");
         return model;

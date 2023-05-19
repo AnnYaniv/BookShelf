@@ -48,51 +48,52 @@ public class BookController {
     }
 
     @GetMapping
-    public ModelAndView bookById(@RequestParam String isbn) {
+    public ModelAndView getBook(@RequestParam String isbn) {
+        bookService.incrementVisited(isbn);
+        final ModelAndView[] modelAndView = {new ModelAndView("book_detail")};
         Optional<Book> optionalBook = bookService.findById(isbn);
-        if (optionalBook.isEmpty()) {
-            return new ModelAndView("forward:/");
-        } else {
-            Book book = optionalBook.get();
-            book.incrementVisited();
-            bookService.save(book);
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Optional<Visitor> visitor = visitorService.findByEmail(authentication.getName());
-            ModelAndView modelAndView = new ModelAndView("book_detail");
-            BookDto dto = BookMapper.toDto(book, bookService.getBookCover(book.getIsbn()));
-
-            modelAndView.addObject("book", dto);
-            if (visitor.isPresent()) {
-                modelAndView.addObject("isDownload", bookService.findElectronicByUserIdAndIsbn(visitor.get().getId(), isbn).isPresent());
-                modelAndView.addObject("isReview", bookService.isBookBought(visitor.get().getId(), isbn));
-            } else {
-                modelAndView.addObject("isDownload", false);
-                modelAndView.addObject("isReview", false);
-            }
-            return modelAndView;
-        }
+        optionalBook.ifPresentOrElse(book -> {
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    String[] userId = new String[1];
+                    visitorService.findByEmail(authentication.getName()).ifPresentOrElse(
+                            user -> userId[0] = user.getId(),
+                            () -> userId[0] = ""
+                    );
+                    modelAndView[0].addObject("book", BookMapper.toDto(book));
+                    modelAndView[0].addObject("isDownload", bookService.findElectronicByUserIdAndIsbn(userId[0], isbn).isPresent());
+                    modelAndView[0].addObject("isReview", bookService.isBookBought(userId[0], isbn));
+                },
+                () -> modelAndView[0] = new ModelAndView("forward:/"));
+        return modelAndView[0];
     }
 
     @GetMapping("/update")
     @PreAuthorize("hasAuthority('book:write')")
-    public ModelAndView editBook(@RequestParam String isbn) {
-        Book book = bookService.findById(isbn).orElseGet(Book::new);
-        ModelAndView modelAndView = new ModelAndView("book_edit");
-        modelAndView.addObject("bookdto", BookMapper.toDto(book, null));
-        modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
-        Author author = new Author();
-        author.setId(UUID.randomUUID().toString());
-        modelAndView.addObject("author", author);
-        modelAndView.addObject("authors", authorService.getAllSorted());
-        return modelAndView;
+    public ModelAndView updateBook(@RequestParam String isbn) {
+        return bookEditFill(new ModelAndView("book_edit"),
+                bookService.findById(isbn).orElseGet(Book::new));
     }
 
     @GetMapping("/create")
     @PreAuthorize("hasAuthority('book:write')")
-    public ModelAndView createBook(){
-        Book book = new Book();
-        ModelAndView modelAndView = new ModelAndView("book_create");
-        modelAndView.addObject("bookdto", BookMapper.toDto(book, null));
+    public ModelAndView createBook() {
+        return bookEditFill(new ModelAndView("book_create"), new Book());
+    }
+
+    @SneakyThrows
+    @PostMapping("/update")
+    @PreAuthorize("hasAuthority('book:write')")
+    public String updateBook(@ModelAttribute BookDto bookdto) {
+        Book book = BookMapper.toBook(bookdto);
+        bookService.setBookFiles(book, bookdto.getCoverMultipart(), bookdto.getBookMultipart());
+        LOGGER.info("cover-{}, file-{}, {}",!bookdto.getCoverMultipart().isEmpty(),
+                !bookdto.getBookMultipart().isEmpty(), book);
+        bookService.save(book);
+        return "Book saved successfully";
+    }
+
+    private ModelAndView bookEditFill(ModelAndView modelAndView, Book book) {
+        modelAndView.addObject("bookdto", BookMapper.toDto(book));
         modelAndView.addObject("genres", Arrays.stream(Genre.values()).toList());
         Author author = new Author();
         author.setId(UUID.randomUUID().toString());
@@ -101,22 +102,8 @@ public class BookController {
         return modelAndView;
     }
 
-
-    @SneakyThrows
-    @PostMapping("/update")
-    @PreAuthorize("hasAuthority('book:write')")
-    public ModelAndView updateBook(@ModelAttribute BookDto bookdto) {
-        Book book = BookMapper.toBook(bookdto);
-        bookService.setBookFiles(book, bookdto.getCoverMultipart(), bookdto.getBookMultipart());
-        bookService.save(book);
-        return editBook(book.getIsbn());
-    }
-
-    @GetMapping("/filter")
-    public ModelAndView filterNameAjax(@RequestParam String name, @RequestParam int page) {
-        LOGGER.debug("ajaxFilter method was called for-{}", name);
-        LOGGER.debug("Books-{}", bookService.findByNameLike(name, page));
-        LOGGER.debug("page-{}", page);
+    @GetMapping("/get-by-name")
+    public ModelAndView getBooksByName(@RequestParam String name, @RequestParam int page) {
         Page<Book> bookPage = bookService.findByNameLike(name, page);
         if (bookPage.getTotalPages() - 1 < page) {
             page = bookPage.getTotalPages() - 1;
@@ -125,8 +112,8 @@ public class BookController {
         return bookSelectionModelCreator(bookPage, page, bookService);
     }
 
-    @GetMapping("/getFilterBy")
-    public ModelAndView filterDtoAjax(@ModelAttribute FilterDto filterDto) {
+    @GetMapping("/get-by-filter")
+    public ModelAndView getBooksByFilter(@ModelAttribute FilterDto filterDto) {
         LOGGER.debug("filter in getFilterBy: {}", filterDto);
         List<Book> books = bookService.filterBook(filterDto);
         if (books.isEmpty()) {
@@ -148,7 +135,7 @@ public class BookController {
     }
 
     @GetMapping("/get-by-user-electronic")
-    public ModelAndView getBooksByUserElectronic(Principal principal, @RequestParam int page) {
+    public ModelAndView getElectronicBooksByUser(Principal principal, @RequestParam int page) {
         LOGGER.debug("get-by-user-electronic {}", page);
         Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
         Page<Book> bookPage = bookService.findByUserElectronic(visitor.getId(), page);
@@ -183,8 +170,7 @@ public class BookController {
         ModelAndView model = new ModelAndView("fragment/book_selection");
         List<BookReviewDto> bookReview = new ArrayList<>();
         books.forEach(book -> bookReview.add(BookReviewMapper.toDto(book,
-                bookService.getAvgByBook(book.getIsbn()),
-                bookService.getBookCover(book.getIsbn()))));
+                bookService.getAvgByBook(book.getIsbn()))));
         model.addObject("books", bookReview);
         model.addObject("page", page);
         return model;

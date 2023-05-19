@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/1c103036b2.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
 
     <link rel="stylesheet" href="/css/book_card.css">
 
@@ -134,7 +135,6 @@
         </div>
         <div class="filter-content">
             <div class="card-body row">
-
                 <button class="btn btn-light" type="button" onclick="filter()">Show result</button>
             </div>
         </div>
@@ -142,23 +142,25 @@
 
 </div>
 
-<div id="main">
+<div id="main" style="background-color: #eee">
     <header th:replace="fragment/header :: header"></header>
-    <section id="selection_books" style="background-color: #eee">
-        <button class="openbtn btn bg-secondary text-dark" onclick="openClose()">
-            <i class="fa-solid fa-arrows-left-right"></i>
-        </button>
-        <div th:replace="fragment/book_selection :: selection(page=${page}, books=${books})"></div>
-    </section>
+    <button class="openbtn btn bg-secondary text-dark" onclick="openClose()">
+        <i class="fa-solid fa-arrows-left-right"></i>
+    </button>
+    <section id="selection_books" th:replace="fragment/book_selection :: selection(page=${page}, book=${book})"></section>
 </div>
 
 <input type="text" id="filter_input" value="empty" class="invisible">
 <input type="text" id="name_input" value="empty" class="invisible">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
-<script src="script/filter_book.js"></script>
 <script src="script/cart.js"></script>
+
 <script>
+    window.onload = function (){
+        const selection_div = $('#selection_books').html();
+        $('#selection_books').html(selection_div+"<script src=\"script/pageable_books.js\"/>");
+    }
+
     function openClose() {
         const size = "25%";
         if (document.getElementById("mySidebar").style.width === size) {
@@ -182,22 +184,35 @@
             genre: genre,
             page: 0
         };
-
         $.ajax({
             type: "GET",
-            url: "/book/getFilterBy",
+            url: "/book/get-by-filter",
             data: filterDto,
             success: function (data) {
-                console.log("we get a response");
                 $('#filter_input').text(JSON.stringify(filterDto));
                 $('#name_input').text("");
-                console.log($('#filter_input').text());
-                $('#selection_books').html(data);
+                $('#selection_books').html(data +
+                    "<script src=\"script/pageable_books_filter.js\"/>");
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 console.log(errorThrown);
             }
+        });
+    }
 
+    function onSearchChange(){
+        const title = $('#search-input').val();
+        $.ajax({
+            type: "GET",
+            url: "/book/get-by-name",
+            data: {name: title, page: 0},
+            success: function (data) {
+                $('#selection_books').html(data +
+                    "<script src=\"script/pageable_books_name.js\"/>");
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
         });
     }
 </script>

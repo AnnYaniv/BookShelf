@@ -50,8 +50,7 @@ public class FavouriteController {
             ModelAndView modelAndView = new ModelAndView("favourite");
             List<BookReviewDto> bookReview = new ArrayList<>();
             books.forEach(book -> bookReview.add(BookReviewMapper.toDto(book,
-                    bookService.getAvgByBook(book.getIsbn()),
-                    bookService.getBookCover(book.getIsbn()))));
+                    bookService.getAvgByBook(book.getIsbn()))));
             modelAndView.addObject("books", bookReview);
             modelAndView.addObject("page", 0);
             return modelAndView;

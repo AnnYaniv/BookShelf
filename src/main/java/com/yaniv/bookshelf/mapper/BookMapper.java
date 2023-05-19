@@ -32,12 +32,12 @@ public class BookMapper {
         return book;
     }
 
-    public static BookDto toDto(Book book, String coverByte) {
+    public static BookDto toDto(Book book) {
         return new BookDto(
                 book.getIsbn(), book.getTitle(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
                 null, null,
-                coverByte, null,
+                null, null,
                 book.getAuthors().stream().map(Author::getId).toList(),
                 book.getGenre()
         );

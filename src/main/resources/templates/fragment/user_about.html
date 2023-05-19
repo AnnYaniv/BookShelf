@@ -3,7 +3,8 @@
         <div class="form-group row">
             <div class="col-md-4 mb-3">
                 <label for="email">Email</label>
-                <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}" readonly required>
+                <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}"
+                       readonly required>
                 <div class="invalid-feedback">Add email</div>
             </div>
             <div class="col-md-4 mb-3">
@@ -12,20 +13,17 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1">@</span>
                     </div>
-                    <input id="username" th:value="${visitor.userName}" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                    <input id="username" th:value="${visitor.userName}" type="text" class="form-control"
+                           placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
 
                 </div>
             </div>
-<!--            <div class="col-md-4 mb-3">-->
-<!--                <label for="p_house">Password</label>-->
-<!--                <input type="text" class="form-control" id="p_house"-->
-<!--                       placeholder="Password">-->
-<!--                <div class="invalid-feedback"></div>-->
-<!--            </div>-->
-            <div class="col-md-4 mb-3">
+            <label th:text="${additionInfo}"></label>
+        </div>
+        <div class="row">
+            <div class="col align-self-end">
                 <button type="button" class="btn btn-success" id="update">Update</button>
             </div>
-            <label th:text="${additionInfo}"></label>
         </div>
     </form>
 </div>

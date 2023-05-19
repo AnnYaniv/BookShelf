@@ -26,7 +26,7 @@
     </style>
 </head>
 <body onload="clean()">
-<header th:replace="fragment/header :: header" ></header>
+<header th:replace="fragment/header :: header"></header>
 <div class="main h-100 d-flex flex-column">
     <div class="container-fluid d-flex flex-fill">
         <div class="row flex-fill">
@@ -52,6 +52,7 @@
                             <i class="fa-solid fa-file-arrow-down" style="color: #ffffff;"></i> Available for download
                         </a>
                     </li>
+                    <hr>
                     <li sec:authorize="hasAuthority('author:write')">
                         <a id="authors" href="/author" class="nav-link text-white" onclick="selected_change('authors')">
                             <i class="fa-solid fa-feather-pointed" style="color: #ffffff;"></i> Authors
@@ -94,8 +95,6 @@
         new_active.classList.add("active");
         new_active.classList.remove("text-white");
     }
-
-
 </script>
 </body>
 </html>

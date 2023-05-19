@@ -182,7 +182,7 @@ public class InvoiceController {
             page = invoicePage.getTotalPages() - 1;
             invoicePage = invoiceService.getAllByEmail(principal.getName(), page);
         }
-        ModelAndView model = new ModelAndView("fragment/all_invoices");
+        ModelAndView model = new ModelAndView("fragment/user_invoices");
         model.addObject("invoices", invoicePage.getContent());
         model.addObject("page", page);
         return model;
@@ -195,7 +195,7 @@ public class InvoiceController {
             page = invoicePage.getTotalPages() - 1;
             invoicePage = invoiceService.getAllByStatus(status, page);
         }
-        ModelAndView modelAndView = new ModelAndView("fragment/filter_invoice");
+        ModelAndView modelAndView = new ModelAndView("fragment/all_invoices");
         modelAndView.addObject("invoices", invoicePage.getContent());
         modelAndView.addObject("cur_status", status);
         modelAndView.addObject("page", page);
@@ -206,7 +206,7 @@ public class InvoiceController {
     public ModelAndView getById(@RequestParam String id) {
         Optional<Invoice> optionalInvoice = invoiceService.findById(id);
         Invoice invoice = optionalInvoice.orElse(new Invoice());
-        ModelAndView modelAndView = new ModelAndView("fragment/invoice");
+        ModelAndView modelAndView = new ModelAndView("all_invoices");
         modelAndView.addObject("books", invoice.getBooksInOrder());
         modelAndView.addObject("inv", id);
         modelAndView.addObject("total", invoice.getBooksInOrder().stream()

@@ -45,7 +45,7 @@ $(function () {
             success: function (data, textStatus, jQxhr) {
                 console.log("pageable products " + 1);
                 $('#data-container').html(data +
-                    "<script src=\"script/products_electronic.js\"></script>");
+                    "<script src=\"script/pageable_electronic_books.js\"></script>");
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 console.log(errorThrown);
@@ -91,6 +91,8 @@ $(function () {
 });
 
 
+
+
 $(function () {
     $('#products').on('click', function (e) {
         $.ajax({
@@ -100,7 +102,25 @@ $(function () {
             success: function (data, textStatus, jQxhr) {
                 console.log("pageable products");
                 $('#data-container').html(data +
-                    "<script src=\"script/products_all.js\"></script>");
+                    "<script src=\"script/pageable_books_user.js\"></script>");
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+        e.preventDefault();
+    })
+});
+
+$(function () {
+    $('#authors').on('click', function (e) {
+        $.ajax({
+            type: "GET",
+            url: "/author",
+            data: {page: 0},
+            success: function (data, textStatus, jQxhr) {
+                console.log("pageable products");
+                $('#data-container').html(data);
             },
             error: function (jqXhr, textStatus, errorThrown) {
                 console.log(errorThrown);

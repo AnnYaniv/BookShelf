@@ -1,4 +1,4 @@
-function onPageFilter(page) {
+function getPage(page) {
     $.ajax({
         type: "GET",
         url: "/favourite/pageable",

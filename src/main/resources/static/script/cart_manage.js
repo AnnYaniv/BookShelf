@@ -1,4 +1,4 @@
-function onPageFilter(page) {
+function getPage(page) {
     var st = document.querySelector('input[name="sort"]:checked').value;
     $.ajax({
         type: "GET",

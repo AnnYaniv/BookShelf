@@ -24,15 +24,14 @@ public class MainController {
     }
 
     @GetMapping
-    public ModelAndView main(){
+    public ModelAndView index(){
         FilterDto filterDto = new FilterDto(500d, 700d, null, null, 0);
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("filterDto", filterDto);
         List<BookReviewDto> bookReview = new ArrayList<>();
         bookService.getAll(0).forEach(book ->
                 bookReview.add(BookReviewMapper.toDto(book,
-                        bookService.getAvgByBook(book.getIsbn()),
-                        bookService.getBookCover(book.getIsbn()))));
+                        bookService.getAvgByBook(book.getIsbn()))));
         modelAndView.addObject("books", bookReview);
         modelAndView.addObject("page",0);
         return modelAndView;

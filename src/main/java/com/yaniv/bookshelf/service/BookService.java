@@ -103,6 +103,12 @@ public class BookService {
         return driveService.download(book.getBookUrl()).toByteArray();
     }
 
+    public String getBookFileExtension(String isbn) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new IllegalArgumentException("Book with isbn=" + isbn + " dont exist"));
+        return driveService.getExtension(book.getBookUrl());
+    }
+
     public Optional<Book> findById(String id) {
         return bookRepository.findByIsbn(id);
     }

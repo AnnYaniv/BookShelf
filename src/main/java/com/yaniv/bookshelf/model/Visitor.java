@@ -10,6 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -36,6 +37,8 @@ public class Visitor {
     private String email;
 
     private String password;
+
+    private LocalDate subscribeExp;
 
     @PrePersist
     public void prePersist() {

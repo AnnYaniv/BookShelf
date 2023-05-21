@@ -55,16 +55,24 @@ public class DriveService {
         ByteArrayContent mediaContent = switch (folder) {
             case COVER -> {
                 fileMetadata.setParents(Collections.singletonList(coverFolderId));
+
                 yield new ByteArrayContent(uploadFile.getContentType(), compressImage(uploadFile));
             }
             case BOOK -> {
-                fileMetadata.setParents(Collections.singletonList(bookFolderId));
+                fileMetadata.setParents(Collections.singletonList(bookFolderId))
+                        .setViewersCanCopyContent(false);
                 yield new ByteArrayContent(uploadFile.getContentType(), uploadFile.getBytes());
             }
         };
 
         File file = service.files().create(fileMetadata, mediaContent).setFields("id").execute();
         return file.getId();
+    }
+
+    @SneakyThrows
+    public String getExtension(String id) {
+        File file = service.files().get(id).execute();
+        return file.getMimeType();
     }
 
     public boolean delete(String id) {

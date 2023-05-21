@@ -35,8 +35,7 @@ public class AuthController {
         boolean isValid = VisitorValidator.isValid(visitorDto);
 
         if(!isExist && isValid) {
-            LOGGER.info("New user {}; saving is disabled!", VisitorMapper.toUser(visitorDto));
-//            LOGGER.info("New user {}", visitorService.save(VisitorMapper.toUser(visitorDto)));
+            LOGGER.info("New user {}", visitorService.save(VisitorMapper.toUser(visitorDto)));
         }
         return new RedirectView("/user");
     }

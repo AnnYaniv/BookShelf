@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Read</title>
+    <!--favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <!--favicon-->
+
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+</head>
+<body>
+<div id="header" th:insert="fragment/header :: header"></div>
+<div class="main h-100 d-flex flex-column">
+    <div class="container-fluid d-flex flex-fill">
+        <div class="row flex-fill">
+            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark"
+                 style="box-shadow: 1px 1px 1px 1px white;">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li th:each="title, iStat  : ${titles}">
+                        <a th:id="${iStat.index}" href="#" class="nav-link text-white" th:text="${title}"
+                           th:attr="onclick=|chapterChange('${iStat.index}')|"></a>
+                    </li>
+                </ul>
+            </div>
+            <div id="data-container" class="col p-0" style="background-color: #eee;">
+                <p th:each="paragraph: ${chapter.paragraphs}" th:text="${paragraph}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function chapterChange(chapter) {
+        const isbn = new URLSearchParams(window.location.search).get('isbn');
+
+        const active = document.getElementsByClassName("active");
+
+        console.log("selected - " + active.length);
+        for (let i = 0; i < active.length; i++) {
+            active[i].classList.add("text-white");
+            active[i].classList.remove("active");
+        }
+
+        var new_active = document.getElementById(chapter);
+        new_active.classList.add("active");
+        new_active.classList.remove("text-white");
+        chapter++;
+        $.ajax({
+            type: "GET",
+            url: "/api/book/book-page",
+            data: {
+                    isbn: isbn,
+                    page: chapter
+                },
+            success: function (data, textStatus, jQxhr) {
+                let str = '';
+
+                for (let i = 0; i < data.length; i++) {
+                    str += '<p>' + data[i] + '</p>';
+                }
+                $('#data-container').html(str);
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
+</script>
+</body>
+</html>

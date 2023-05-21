@@ -1,5 +1,7 @@
 package com.yaniv.bookshelf.controller;
 
+import com.yaniv.bookshelf.bookutils.Chapter;
+import com.yaniv.bookshelf.bookutils.FB2Utils;
 import com.yaniv.bookshelf.dto.BookDto;
 import com.yaniv.bookshelf.dto.BookReviewDto;
 import com.yaniv.bookshelf.dto.FilterDto;
@@ -145,6 +147,27 @@ public class BookController {
         }
         return bookSelectionModelCreator(bookPage, page, bookService);
     }
+
+    @GetMapping("/read")
+    @PreAuthorize("hasAuthority('book:read')")
+    public ModelAndView readBook(@RequestParam String isbn, Principal principal){
+        String ext = bookService.getBookFileExtension(isbn);
+        ModelAndView model = new ModelAndView("forward:/");
+        if(visitorService.isSubscribed(principal.getName())) {
+            if (ext.equals("application/pdf")) {
+                model = new ModelAndView("book_read_pdf");
+                model.addObject("id", bookService.findById(isbn).orElse(new Book()).getBookUrl());
+            } else {
+                model = new ModelAndView("book_read");
+                model.addObject("titles", FB2Utils.getTitles(new ByteArrayInputStream(bookService.getBookFile(isbn)))
+                        .stream().map(Chapter::getTitle).toList());
+                model.addObject("chapter", FB2Utils.getChapter(1,
+                        new ByteArrayInputStream(bookService.getBookFile(isbn))));
+            }
+        }
+        return model;
+    }
+
 
     @GetMapping("/drive")
     public ResponseEntity<Object> downloadDrive(@RequestParam String isbn, Principal principal) {

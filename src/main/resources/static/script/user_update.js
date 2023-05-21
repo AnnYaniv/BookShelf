@@ -22,3 +22,19 @@ $(function () {
         e.preventDefault();
     })
 });
+
+function purchase(subscription){
+    $.ajax({
+        type: "POST",
+        url: "/user/subscribe",
+        data: {
+            time: subscription
+        },
+        success: function (data, textStatus, jQxhr) {
+            console.log("expires at " + data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}

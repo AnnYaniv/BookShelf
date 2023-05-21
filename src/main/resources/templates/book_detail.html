@@ -95,6 +95,8 @@
                        class="btn btn-lg btn-warning text-uppercase">update</a>
                     <a th:if="${isDownload}" th:href="@{/book/drive(isbn=${book.isbn})}"
                        class="btn btn-lg btn-success text-uppercase">download</a>
+                    <a sec:authorize="hasAuthority('book:read')" th:href="@{/book/read(isbn=${book.isbn})}"
+                       class="btn btn-lg btn-success text-uppercase">read</a>
                 </article>
             </aside>
         </div>

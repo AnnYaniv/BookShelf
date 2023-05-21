@@ -3,14 +3,20 @@ package com.yaniv.bookshelf.controller;
 import com.yaniv.bookshelf.dto.VisitorDto;
 import com.yaniv.bookshelf.mapper.VisitorMapper;
 import com.yaniv.bookshelf.model.Visitor;
+import com.yaniv.bookshelf.model.enums.Role;
+import com.yaniv.bookshelf.model.enums.SubscribeTime;
+import com.yaniv.bookshelf.repository.VisitorRepository;
 import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/user")
@@ -48,4 +54,13 @@ public class UserController {
         return model;
     }
 
+    @PostMapping("/subscribe")
+    public String subscribe(Principal principal, @RequestParam String time) {
+        Visitor visitor = visitorService.save(visitorService.findByEmail(principal.getName()).orElse(new Visitor()));
+        SubscribeTime subscribeTime = EnumUtils.findEnumInsensitiveCase(SubscribeTime.class, time);
+        visitor.setSubscribeExp(LocalDate.now().plusMonths(subscribeTime.getCount()));
+        visitor.setRole(Role.SUBSCRIBER);
+        visitorService.save(visitor);
+        return visitor.getSubscribeExp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 }

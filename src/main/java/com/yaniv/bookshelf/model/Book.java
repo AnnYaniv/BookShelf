@@ -11,9 +11,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 
@@ -39,6 +37,7 @@ public class Book{
 
     @Type(type="text")
     private String annotation;
+
     @ElementCollection(targetClass = Genre.class)
     @CollectionTable(name = "book_genre", joinColumns = @JoinColumn(name = "isbn"))
     @Enumerated(EnumType.STRING)
@@ -56,8 +55,8 @@ public class Book{
 
     private String coverUrl;
 
-    @NotBlank
-    private String bookUrl;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<ExtBook> bookUrls = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

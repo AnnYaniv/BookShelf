@@ -9,6 +9,7 @@ import com.yaniv.bookshelf.mapper.BookMapper;
 import com.yaniv.bookshelf.mapper.BookReviewMapper;
 import com.yaniv.bookshelf.model.Author;
 import com.yaniv.bookshelf.model.Book;
+import com.yaniv.bookshelf.model.ExtBook;
 import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.model.enums.Genre;
 import com.yaniv.bookshelf.service.AuthorService;
@@ -151,12 +152,12 @@ public class BookController {
     @GetMapping("/read")
     @PreAuthorize("hasAuthority('book:read')")
     public ModelAndView readBook(@RequestParam String isbn, Principal principal){
-        String ext = bookService.getBookFileExtension(isbn);
+        ExtBook ext = bookService.getExtBook(isbn);
         ModelAndView model = new ModelAndView("forward:/");
         if(visitorService.isSubscribed(principal.getName())) {
-            if (ext.equals("application/pdf")) {
+            if (ext.getExtension().equals("pdf")) {
                 model = new ModelAndView("book_read_pdf");
-                model.addObject("id", bookService.findById(isbn).orElse(new Book()).getBookUrl());
+                model.addObject("id", ext.getUrl());
             } else {
                 model = new ModelAndView("book_read");
                 model.addObject("titles", FB2Utils.getTitles(new ByteArrayInputStream(bookService.getBookFile(isbn)))
@@ -170,22 +171,23 @@ public class BookController {
 
 
     @GetMapping("/drive")
-    public ResponseEntity<Object> downloadDrive(@RequestParam String isbn, Principal principal) {
-        Book book = bookService.findElectronicByUserIdAndIsbn(
-                        visitorService.findByEmail(principal.getName()).orElse(new Visitor()).getId(), isbn).
+    public ResponseEntity<Object> downloadDrive(@RequestParam String isbn, @RequestParam String ext, Principal principal) {
+        Book book = bookService.findElectronicByUserIdAndIsbn(visitorService
+                        .findByEmail(principal.getName()).orElse(new Visitor()).getId(), isbn).
                 orElseGet(Book::new);
-        byte[] file = bookService.getBookFile(isbn);
+        byte[] file = bookService.getBookFileByUrl(book.getBookUrls().stream().filter(eb -> eb.getExtension().equals(ext)).findFirst().orElseThrow(
+                () -> new IllegalArgumentException("Wrong file extension")).getUrl());
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(file));
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition",
-                String.format("attachment; filename=\"%s\"", book.getBookUrl()));
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s.%s\"",
+                book.getIsbn(), bookService.getExtBook(book.getIsbn()).getExtension()));
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers)
-                .contentLength(file.length)
-                .contentType(MediaType.parseMediaType(
-                        new MimetypesFileTypeMap().getContentType(book.getBookUrl())))
+                .contentLength(file.length).contentType(MediaType.parseMediaType(
+                        new MimetypesFileTypeMap().getContentType("isbn." +
+                                bookService.getExtBook(isbn).getExtension())))
                 .body(resource);
     }
 

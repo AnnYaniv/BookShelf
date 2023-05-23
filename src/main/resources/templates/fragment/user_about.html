@@ -1,3 +1,5 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <div class="container py-5" th:fragment="update">
     <form class="not-validated" method="post">
         <div class="form-group row">
@@ -25,21 +27,20 @@
                 <button type="button" class="btn btn-success" id="update">Update</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <p>Purchase a subscribed: </p>
+        <div class="row mt-3" sec:authorize = "hasAuthority('subscribe:subscribe')">
+            <div class="col-sm-2">
+                <p>Subscribe: </p>
             </div>
-            <div class="col">
-                <button type="button" class="btn btn-success" id="one" onclick="purchase('MONTH')">One Month</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-success" id="three" onclick="purchase('THREE_MONTH')">Three Month</button>
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-success" id="six" onclick="purchase('SIX_MONTH')">Six Month</button>
-            </div>
-            <div class="col">
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-outline-secondary" id="one" onclick="purchase('MONTH')">One Month</button>
+                <button type="button" class="btn btn-outline-primary" id="three" onclick="purchase('THREE_MONTH')">Three Month</button>
+                <button type="button" class="btn btn-outline-success" id="six" onclick="purchase('SIX_MONTH')">Six Month</button>
                 <button type="button" class="btn btn-success" id="year" onclick="purchase('YEAR')">One Year</button>
+            </div>
+        </div>
+        <div class="row mt-3" sec:authorize = "hasAuthority('subscribe:unsubscribe')">
+            <div class="col">
+                <button type="button" class="btn btn-warning" onclick="unsubscribe()"> Unsubscribe</button>
             </div>
         </div>
     </form>

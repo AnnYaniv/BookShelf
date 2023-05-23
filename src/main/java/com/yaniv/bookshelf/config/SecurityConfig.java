@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web)  {
         web.ignoring().antMatchers("/covers/**");
     }
 
@@ -48,12 +48,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/pageable").permitAll()
                 .antMatchers("/book/**").permitAll()
-                .antMatchers("/review/all").permitAll()
-                .antMatchers("/styles/**").permitAll()
-                .antMatchers("/script/**").permitAll()
-                .antMatchers("/auth").permitAll()
+                .antMatchers("/review/**").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .antMatchers("/cart/**").permitAll()
-                .antMatchers("/author/all").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/script/**").permitAll()
+                .antMatchers("/no_cover.png").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

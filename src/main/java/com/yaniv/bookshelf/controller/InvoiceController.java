@@ -206,7 +206,7 @@ public class InvoiceController {
     public ModelAndView getById(@RequestParam String id) {
         Optional<Invoice> optionalInvoice = invoiceService.findById(id);
         Invoice invoice = optionalInvoice.orElse(new Invoice());
-        ModelAndView modelAndView = new ModelAndView("all_invoices");
+        ModelAndView modelAndView = new ModelAndView("fragment/invoice_details");
         modelAndView.addObject("books", invoice.getBooksInOrder());
         modelAndView.addObject("inv", id);
         modelAndView.addObject("total", invoice.getBooksInOrder().stream()

@@ -1,10 +1,7 @@
 package com.yaniv.bookshelf.model;
 
 import com.yaniv.bookshelf.model.ids.ReviewId;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -16,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Review {
     @Id @Column(name = "book_isbn")
     private String book;
@@ -32,6 +28,21 @@ public class Review {
 
     private LocalDateTime time;
 
+    private boolean isBanned;
+
+    public Review(String book, String visitor, int mark, String message, LocalDateTime time) {
+        this.book = book;
+        this.visitor = visitor;
+        this.mark = mark;
+        this.message = message;
+        this.time = time;
+    }
+
+    public Review(String book, String visitor, int mark, String message, LocalDateTime time, boolean isBanned) {
+        this(book, visitor, mark, message, time);
+        this.isBanned = isBanned;
+    }
+
     @Override
     public String toString() {
         return "Review{" +
@@ -40,6 +51,7 @@ public class Review {
                 ", mark=" + mark +
                 ", message='" + message + '\'' +
                 ", time=" + time +
+                ", isBanned=" + isBanned +
                 '}';
     }
 

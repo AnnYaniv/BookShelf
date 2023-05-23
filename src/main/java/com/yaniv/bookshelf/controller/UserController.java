@@ -5,11 +5,13 @@ import com.yaniv.bookshelf.mapper.VisitorMapper;
 import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.model.enums.Role;
 import com.yaniv.bookshelf.model.enums.SubscribeTime;
-import com.yaniv.bookshelf.repository.VisitorRepository;
 import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.yaml.snakeyaml.util.EnumUtils;
@@ -61,6 +63,22 @@ public class UserController {
         visitor.setSubscribeExp(LocalDate.now().plusMonths(subscribeTime.getCount()));
         visitor.setRole(Role.SUBSCRIBER);
         visitorService.save(visitor);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(),
+                auth.getCredentials(), visitor.getRole().getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
         return visitor.getSubscribeExp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    @PostMapping("/unsubscribe")
+    public String unsubscribe(Principal principal){
+        Visitor visitor = visitorService.findByEmail(principal.getName()).orElse(new Visitor());
+        visitor.setSubscribeExp(null);
+        visitorService.isSubscribed(visitor.getId());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(),
+                auth.getCredentials(), visitor.getRole().getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        return visitor.toString();
     }
 }

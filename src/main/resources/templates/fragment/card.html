@@ -1,3 +1,6 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
 <div class="col-md-6 col-lg-4 mb-4 mb-md-0">
     <div class="card text-black" th:fragment="card">
         <img th:id="${book.isbn}" src="no_cover.png" class="card-img-top downloadable"/>
@@ -62,7 +65,8 @@
         </div>
         <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
             <button th:attr="onclick=|get_inv_by_id('${invoice.id}')|"
-                    type="button" class="btn btn-info"> Learn more </button>
+                    type="button" class="btn btn-info"> Learn more
+            </button>
         </div>
     </div>
 </div>
@@ -113,7 +117,6 @@
 </div>
 
 
-
 <div class="card rounded-3 mb-4">
     <div class="card-body p-4" th:fragment="card_review">
         <div class="row d-flex align-items-center">
@@ -130,8 +133,16 @@
                 </p>
                 <p><span class="text-muted" th:text="${review.message}">review</span></p>
             </div>
-            <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+            <div th:if="${review.isBanned}" class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                <h5 class="mb-0">Banned</h5>
+            </div>
+            <div th:unless="${review.isBanned}" class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
                 <h5 class="mb-0" th:text="${#temporals.format(review.time, 'dd-MM-yyyy HH:mm')}">time</h5>
+            </div>
+            <div class="col" sec:authorize="hasAuthority('review:edit')">
+                <a href="#" th:attr="onclick=|ban('${review.book}','${review.visitor}')|">
+                    <i class="fa-solid fa-ban"></i>
+                </a>
             </div>
         </div>
     </div>

@@ -40,6 +40,25 @@ function star_click(mark) {
     }
 }
 
+function ban(isbn, visitor) {
+    console.log(isbn);
+    console.log(visitor);
+    $.ajax({
+        type: "POST",
+        url: "/review/ban",
+        data: {
+            book: isbn,
+            visitor: visitor
+        },
+        success: function (data, textStatus, jQxhr) {
+            $('#review-container').html(data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
 function getPage(page) {
         var filterDto = JSON.parse($('#filter_input').text());
         filterDto.page = page;

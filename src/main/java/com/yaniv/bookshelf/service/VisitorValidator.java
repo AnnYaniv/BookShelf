@@ -10,6 +10,6 @@ public abstract class VisitorValidator {
     }
     public static boolean isValid(VisitorDto visitor){
         Matcher matcher = Pattern.compile("^(.+)@(\\S+)$").matcher(visitor.getEmail());
-        return matcher.matches() && (visitor.getPassword().length() > 8);
+        return matcher.matches() && (visitor.getPassword().length() >= 8);
     }
 }

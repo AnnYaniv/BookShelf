@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ReviewService {
     private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
@@ -24,8 +26,17 @@ public class ReviewService {
         LOGGER.debug("Saving review {}", review);
         return reviewRepository.save(review);
     }
+
     public Page<Review> findByBook_Isbn(String isbn, int page){
         return reviewRepository.findByBook(isbn, PageRequest.of(page, ITEMS_PER_PAGE));
+    }
+
+    public Page<Review> findByBookNotBanned(String isbn, int page){
+        return reviewRepository.findByBookAndBannedIsFalse(isbn, PageRequest.of(page, ITEMS_PER_PAGE));
+    }
+
+    public Optional<Review> findByBookAndUsername(String book, String visitor){
+        return reviewRepository.findByBookAndUsername(book, visitor);
     }
 
     public double getAvgByBook(String isbn){

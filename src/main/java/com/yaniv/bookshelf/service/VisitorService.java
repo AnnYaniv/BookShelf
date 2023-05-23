@@ -39,19 +39,14 @@ public class VisitorService {
         return visitorRepository.findByEmail(email);
     }
 
-    public Visitor createUser(Visitor visitor) {
-        LOGGER.info("new user creating {}", visitor.getEmail());
-        visitor.setRole(Role.USER);
-        return visitorRepository.save(visitor);
-    }
-
     public boolean isSubscribed(String id) {
         AtomicBoolean result = new AtomicBoolean(true);
         visitorRepository.findById(id).ifPresent(
                 user -> {
-                    if (LocalDate.now().isAfter(user.getSubscribeExp())) {
+                    if ((user.getSubscribeExp() == null) || LocalDate.now().isAfter(user.getSubscribeExp())) {
                         user.setSubscribeExp(null);
                         user.setRole(Role.USER);
+                        save(user);
                         result.set(false);
                     }
                 }

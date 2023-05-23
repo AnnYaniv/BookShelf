@@ -11,7 +11,7 @@
 <body style="background-color: #E5E4E2">
 <header th:replace="fragment/header :: header"></header>
 <div class="container" style="background-color: #E5E4E2">
-    <h2>Cart details <small th:text="${'total: ' + total}"></small></h2>
+    <h2 class="text-center">Cart details <small th:text="${'total: ' + total}"></small></h2>
     <ul class="responsive-table">
         <li class="table-header">
             <div class="col col-1">Book</div>
@@ -32,11 +32,10 @@
             <div class="col col-1"></div>
             <div class="col col-2"></div>
             <div class="col col-3"></div>
-            <div class="col-4">
-                <a href="/cart"><button type="button" class="btn btn-info" style="font-size: 16px">Return</button></a>
-            </div>
+            <div class="col col-4"></div>
             <div class="col col-5">
-                <a id="create-cart-button" href="/user"><button type="button" class="btn btn-warning" style="font-size: 16px">Pay</button></a>
+                <a href="/cart" class="btn btn btn-outline-primary">Return</a>
+                <a id="create-cart-button" class="btn btn-warning" href="/user">Pay</a>
             </div>
         </li>
     </ul>

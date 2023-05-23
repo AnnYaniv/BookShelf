@@ -27,12 +27,14 @@ public class Visitor {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(unique = true)
     private String userName;
 
     @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Invoice> invoices;
 
+    @Column(unique = true)
     @NotBlank
     private String email;
 

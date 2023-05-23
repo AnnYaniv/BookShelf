@@ -30,8 +30,28 @@
 <div class="main h-100 d-flex flex-column">
     <div class="container-fluid d-flex flex-fill">
         <div class="row flex-fill">
-            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark" style="box-shadow: 1px 1px 1px 1px white;">
+            <div class="col-2 bg-light pr-3 menuContainer d-flex flex-column text-white bg-dark" style="width: 280px; ">
                 <ul class="nav nav-pills flex-column mb-auto">
+                    <hr>
+                    <li sec:authorize="hasAuthority('subscribe:subscribe')">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+                            <strong>USER</strong>
+                        </a>
+                    </li>
+                    <li sec:authorize="hasAuthority('book:write')">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fa-solid fa-user-ninja" style="color: #ffffff;"></i>
+                            <strong>ADMIN</strong>
+                        </a>
+                    </li>
+                    <li sec:authorize="hasAuthority('subscribe:unsubscribe')">
+                        <a href="#" class="nav-link text-white">
+                            <i class="fa-solid fa-user-plus" style="color: #ffffff;"></i>
+                            <strong>SUBSCRIBER</strong>
+                        </a>
+                    </li>
+                    <hr>
                     <li>
                         <a id="dashboard" href="#" class="nav-link text-white" onclick="selected_change('dashboard')">
                             <i class="fa-solid fa-table-columns" style="color: #ffffff;"></i> Dashboard

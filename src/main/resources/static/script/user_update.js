@@ -31,7 +31,21 @@ function purchase(subscription){
             time: subscription
         },
         success: function (data, textStatus, jQxhr) {
+            location.reload();
             console.log("expires at " + data);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+function unsubscribe(){
+    $.ajax({
+        type: "POST",
+        url: "/user/unsubscribe",
+        success: function (data, textStatus, jQxhr) {
+            location.reload();
         },
         error: function (jqXhr, textStatus, errorThrown) {
             console.log(errorThrown);

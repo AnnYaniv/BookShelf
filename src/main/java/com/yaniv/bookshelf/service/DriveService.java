@@ -50,12 +50,10 @@ public class DriveService {
     @SneakyThrows
     public String upload(String filename, MultipartFile uploadFile, Folder folder) {
         File fileMetadata = new File();
-        fileMetadata.setName((!StringUtils.isBlank(uploadFile.getContentType())) ? filename :
-                filename + "." + FilenameUtils.getExtension(uploadFile.getOriginalFilename()));
+        fileMetadata.setName(filename + "." + FilenameUtils.getExtension(uploadFile.getOriginalFilename()));
         ByteArrayContent mediaContent = switch (folder) {
             case COVER -> {
                 fileMetadata.setParents(Collections.singletonList(coverFolderId));
-
                 yield new ByteArrayContent(uploadFile.getContentType(), compressImage(uploadFile));
             }
             case BOOK -> {
@@ -71,8 +69,8 @@ public class DriveService {
 
     @SneakyThrows
     public String getExtension(String id) {
-        File file = service.files().get(id).execute();
-        return file.getMimeType();
+        File file = service.files().get(id).setFields("id, originalFilename, fileExtension").execute();
+        return file.getFileExtension();
     }
 
     public boolean delete(String id) {

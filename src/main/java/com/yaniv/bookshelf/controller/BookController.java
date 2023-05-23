@@ -26,10 +26,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.activation.MimeType;
 import javax.activation.MimetypesFileTypeMap;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.ByteArrayInputStream;
 import java.security.Principal;
 import java.util.*;
@@ -88,7 +91,7 @@ public class BookController {
     public String updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
         bookService.setBookFiles(book, bookdto.getCoverMultipart(), bookdto.getBookMultipart());
-        LOGGER.info("cover-{}, file-{}, {}",!bookdto.getCoverMultipart().isEmpty(),
+        LOGGER.info("cover-{}, file-{}, {}", !bookdto.getCoverMultipart().isEmpty(),
                 !bookdto.getBookMultipart().isEmpty(), book);
         bookService.save(book);
         return "Book saved successfully";
@@ -150,10 +153,10 @@ public class BookController {
 
     @GetMapping("/read")
     @PreAuthorize("hasAuthority('book:read')")
-    public ModelAndView readBook(@RequestParam String isbn, Principal principal){
+    public ModelAndView readBook(@RequestParam String isbn, Principal principal) {
         String ext = bookService.getBookFileExtension(isbn);
         ModelAndView model = new ModelAndView("forward:/");
-        if(visitorService.isSubscribed(principal.getName())) {
+        if (visitorService.isSubscribed(principal.getName())) {
             if (ext.equals("application/pdf")) {
                 model = new ModelAndView("book_read_pdf");
                 model.addObject("id", bookService.findById(isbn).orElse(new Book()).getBookUrl());
@@ -178,14 +181,14 @@ public class BookController {
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition",
-                String.format("attachment; filename=\"%s\"", book.getBookUrl()));
+                String.format("attachment; filename=\"%s.%s\"",
+                        book.getIsbn(), bookService.getBookFileExtension(book.getIsbn())));
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers)
                 .contentLength(file.length)
-                .contentType(MediaType.parseMediaType(
-                        new MimetypesFileTypeMap().getContentType(book.getBookUrl())))
+                .contentType(MediaType.parseMediaType(new MimetypesFileTypeMap().getContentType(book.getBookUrl())))
                 .body(resource);
     }
 

@@ -5,6 +5,7 @@ import com.yaniv.bookshelf.mapper.VisitorMapper;
 import com.yaniv.bookshelf.model.Visitor;
 import com.yaniv.bookshelf.model.enums.Role;
 import com.yaniv.bookshelf.model.enums.SubscribeTime;
+import com.yaniv.bookshelf.security.UserDetailsServiceImpl;
 import com.yaniv.bookshelf.service.VisitorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.yaml.snakeyaml.util.EnumUtils;
@@ -25,10 +27,12 @@ import java.time.format.DateTimeFormatter;
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger("controller-log");
     private final VisitorService visitorService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    public UserController(VisitorService visitorService) {
+    public UserController(VisitorService visitorService, UserDetailsServiceImpl userDetailsService) {
         this.visitorService = visitorService;
+        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping
@@ -50,7 +54,10 @@ public class UserController {
         LOGGER.debug("post /user/about");
         Visitor visitor = visitorService.save(VisitorMapper.toVisitor(visitorDto,
                 visitorService.findByEmail(principal.getName()).orElse(new Visitor())));
-        ModelAndView model = new ModelAndView("user_about");
+        ModelAndView model = new ModelAndView("fragment/user_about");
+        UserDetails userDetails = userDetailsService.loadUserByUsername(visitor.getEmail());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, visitor.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         model.addObject("visitor", visitor);
         model.addObject("additionInfo", "Updated successfully");
         return model;

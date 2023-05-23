@@ -6,8 +6,10 @@
             <div class="col-md-4 mb-3">
                 <label for="email">Email</label>
                 <input type="text" class="form-control" id="email" placeholder="Email" th:value="${visitor.email}"
-                       readonly required>
-                <div class="invalid-feedback">Add email</div>
+                       required>
+                <div class="invalid-feedback">
+                    Incorrect e-mail
+                </div>
             </div>
             <div class="col-md-4 mb-3">
                 <label for="username">Username</label>
@@ -16,29 +18,47 @@
                         <span class="input-group-text" id="basic-addon1">@</span>
                     </div>
                     <input id="username" th:value="${visitor.userName}" type="text" class="form-control"
-                           placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
-
+                           placeholder="Username" aria-label="Username" required>
+                    <div class="invalid-feedback">Username must have at least 8 characters</div>
                 </div>
             </div>
-            <label th:text="${additionInfo}"></label>
         </div>
+        <div class="form-group row">
+            <div class="col-md-4 mb-3">
+                <label for="password">New password</label>
+                <input type="password" class="form-control" id="password" placeholder="Type password" required>
+                <div class="invalid-feedback">Password must have at least 8 characters</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="repeat">Repeat password</label>
+                <input id="repeat" type="password" class="form-control" placeholder="Repeat password">
+                <div class="invalid-feedback">Passwords must match</div>
+            </div>
+        </div>
+        <div th:if="${additionInfo.length() > 1}" class="alert alert-success" role="alert"
+             th:text="${additionInfo}"></div>
         <div class="row">
             <div class="col align-self-end">
                 <button type="button" class="btn btn-success" id="update">Update</button>
             </div>
         </div>
-        <div class="row mt-3" sec:authorize = "hasAuthority('subscribe:subscribe')">
+        <div class="row mt-3" sec:authorize="hasAuthority('subscribe:subscribe')">
             <div class="col-sm-2">
                 <p>Subscribe: </p>
             </div>
             <div class="col-sm-8">
-                <button type="button" class="btn btn-outline-secondary" id="one" onclick="purchase('MONTH')">One Month</button>
-                <button type="button" class="btn btn-outline-primary" id="three" onclick="purchase('THREE_MONTH')">Three Month</button>
-                <button type="button" class="btn btn-outline-success" id="six" onclick="purchase('SIX_MONTH')">Six Month</button>
+                <button type="button" class="btn btn-outline-secondary" id="one" onclick="purchase('MONTH')">One Month
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="three" onclick="purchase('THREE_MONTH')">Three
+                    Month
+                </button>
+                <button type="button" class="btn btn-outline-success" id="six" onclick="purchase('SIX_MONTH')">Six
+                    Month
+                </button>
                 <button type="button" class="btn btn-success" id="year" onclick="purchase('YEAR')">One Year</button>
             </div>
         </div>
-        <div class="row mt-3" sec:authorize = "hasAuthority('subscribe:unsubscribe')">
+        <div class="row mt-3" sec:authorize="hasAuthority('subscribe:unsubscribe')">
             <div class="col">
                 <button type="button" class="btn btn-warning" onclick="unsubscribe()"> Unsubscribe</button>
             </div>

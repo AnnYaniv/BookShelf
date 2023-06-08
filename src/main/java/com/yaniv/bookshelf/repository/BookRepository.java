@@ -2,6 +2,7 @@ package com.yaniv.bookshelf.repository;
 
 import com.yaniv.bookshelf.model.Book;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,4 +42,7 @@ public interface BookRepository extends JpaRepository<Book, String> {
 
     @Query("select avg(rev.mark) from Review rev where rev.book = :isbn")
     Double getAvgByBook(@Param("isbn") String isbn);
+
+    @Query("from Book b order by b.visited desc")
+    Page<Book> findAll(Pageable pageable);
 }

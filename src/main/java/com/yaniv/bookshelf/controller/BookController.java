@@ -157,7 +157,7 @@ public class BookController {
         String ext = bookService.getBookFileExtension(isbn);
         ModelAndView model = new ModelAndView("forward:/");
         if (visitorService.isSubscribed(principal.getName())) {
-            if (ext.equals("application/pdf")) {
+            if (ext.equals("pdf")) {
                 model = new ModelAndView("book_read_pdf");
                 model.addObject("id", bookService.findById(isbn).orElse(new Book()).getBookUrl());
             } else {

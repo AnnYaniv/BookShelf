@@ -15,7 +15,7 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
 </head>
-<body>
+<body style="background-color: #eee;">
 <div id="header" th:insert="fragment/header :: header"></div>
 <div class="main h-100 d-flex flex-column">
     <div class="container-fluid d-flex flex-fill">
@@ -29,7 +29,7 @@
                     </li>
                 </ul>
             </div>
-            <div id="data-container" class="col p-0" style="background-color: #eee;">
+            <div id="data-container" class="col pl-3 mt-3" >
                 <p th:each="paragraph: ${chapter.paragraphs}" th:text="${paragraph}"></p>
             </div>
         </div>

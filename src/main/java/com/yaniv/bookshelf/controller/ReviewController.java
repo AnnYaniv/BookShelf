@@ -97,6 +97,6 @@ public class ReviewController {
             review.setBanned(!review.isBanned());
             reviewService.save(review);
         });
-        return getAllReviews(book, 1);
+        return getAllReviews(book, 0);
     }
 }

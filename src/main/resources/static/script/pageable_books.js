@@ -4,8 +4,8 @@ function getPage(page) {
         url: "/pageable",
         data: {page: page},
         success: function (data) {
-            console.log("get by name " + page);
-            $('#data-container').html(data +
+            console.log("get all " + page);
+            $('#selection_books').html(data +
                 "<script src=\"script/pageable_books.js\"></script>");
         },
         error: function (jqXhr, textStatus, errorThrown) {

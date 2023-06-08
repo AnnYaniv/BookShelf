@@ -40,7 +40,7 @@ public class MainController {
     @GetMapping("/pageable")
     public ModelAndView getPage(int page){
         Page<Book> bookPage = bookService.getAll(page);
-        if(bookPage.getTotalPages() < page){
+        if(bookPage.getTotalPages() <= page-1){
             page = bookPage.getTotalPages();
             bookPage = bookService.getAll(page);
         }

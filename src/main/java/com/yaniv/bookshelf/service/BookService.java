@@ -5,6 +5,7 @@ import com.yaniv.bookshelf.model.Book;
 import com.yaniv.bookshelf.model.ExtBook;
 import com.yaniv.bookshelf.repository.BookFilter;
 import com.yaniv.bookshelf.repository.BookRepository;
+import com.yaniv.bookshelf.repository.ExtBookRepository;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
@@ -30,12 +31,14 @@ public class BookService {
     private BookRepository bookRepository;
     private BookFilter bookFilter;
     private DriveService driveService;
+    private ExtBookRepository extBookRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, BookFilter bookFilter, DriveService driveService) {
+    public BookService(BookRepository bookRepository, BookFilter bookFilter, DriveService driveService, ExtBookRepository extBookRepository) {
         this.driveService = driveService;
         this.bookRepository = bookRepository;
         this.bookFilter = bookFilter;
+        this.extBookRepository = extBookRepository;
     }
 
     public Optional<Book> findByUserIdAndIsbn(String userId, String isbn) {
@@ -69,12 +72,13 @@ public class BookService {
         if (StringUtils.isBlank(book.getCoverUrl())) {
             book.setCoverUrl(beforeUpd.getCoverUrl());
         }
+        extBookRepository.saveAll(book.getBookUrls());
         return bookRepository.save(book);
     }
 
 
     @SneakyThrows
-    public Book setBookFiles(Book book, MultipartFile cover, MultipartFile bookFile) {
+    public Book setBookCover(Book book, MultipartFile cover) {
         Optional<Book> current = findById(book.getIsbn());
         if (!cover.isEmpty()) {
             if (current.isPresent() && !StringUtils.isBlank(current.get().getCoverUrl())) {
@@ -83,11 +87,18 @@ public class BookService {
             String id = driveService.upload(book.getIsbn(), cover, DriveService.Folder.COVER);
             book.setCoverUrl(id);
         }
-        String id = driveService.upload(book.getIsbn(), bookFile, DriveService.Folder.BOOK);
-        String ext = FilenameUtils.getExtension(bookFile.getName());
-        book.getBookUrls().add(new ExtBook(ext, id));
-
         return book;
+    }
+
+    public boolean setBookFiles(Book book, MultipartFile[] bookFiles){
+        for (MultipartFile file : bookFiles) {
+            ExtBook extBook = new ExtBook(FilenameUtils.getExtension(file.getName()),
+                    driveService.upload(book.getIsbn(), file, DriveService.Folder.BOOK));
+            if (!book.getBookUrls().add(extBook)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getBookCover(String isbn) {

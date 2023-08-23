@@ -55,7 +55,6 @@ public class DriveService {
         ByteArrayContent mediaContent = switch (folder) {
             case COVER -> {
                 fileMetadata.setParents(Collections.singletonList(coverFolderId));
-
                 yield new ByteArrayContent(uploadFile.getContentType(), compressImage(uploadFile));
             }
             case BOOK -> {
@@ -68,6 +67,7 @@ public class DriveService {
         File file = service.files().create(fileMetadata, mediaContent).setFields("id").execute();
         return file.getId();
     }
+
 
     @SneakyThrows
     public String getExtension(String id) {

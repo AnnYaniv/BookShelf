@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+<description>
+    <title-info>
+        <genre>antique</genre>
+        <author><first-name></first-name><last-name>Unknown</last-name></author>
+        <book-title>0667c70e8ab1b6a6cfca6abd397ee2c6</book-title>
+        <lang>en</lang>
+    </title-info>
+    <document-info>
+        <author><first-name></first-name><last-name>Unknown</last-name></author>
+        <program-used>calibre 6.23.0</program-used>
+        <date>23.8.2023</date>
+        <id>be9bd383-2c47-42f7-a44a-887970dce440</id>
+        <version>1.0</version>
+    </document-info>
+    <publish-info>
+    </publish-info>
+</description>
+<body>
+<section>
+<p>Test Chapter</p>
+<p> </p>
+<p>lorem ipsum</p>
+</section>
+</body>
+
+</FictionBook>

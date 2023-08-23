@@ -88,7 +88,7 @@ public class BookController {
     @PreAuthorize("hasAuthority('book:write')")
     public String updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
-        bookService.setBookFiles(book, bookdto.getCoverMultipart(), bookdto.getBookMultipart());
+        bookService.setBookCover(book, bookdto.getCoverMultipart());
         LOGGER.info("cover-{}, file-{}, {}",!bookdto.getCoverMultipart().isEmpty(),
                 !bookdto.getBookMultipart().isEmpty(), book);
         bookService.save(book);

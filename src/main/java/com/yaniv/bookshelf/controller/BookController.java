@@ -73,8 +73,7 @@ public class BookController {
     @GetMapping("/update")
     @PreAuthorize("hasAuthority('book:write')")
     public ModelAndView updateBook(@RequestParam String isbn) {
-        return bookEditFill(new ModelAndView("book_edit"),
-                bookService.findById(isbn).orElseGet(Book::new));
+        return bookEditFill(new ModelAndView("book_edit"), bookService.findById(isbn).orElseGet(Book::new));
     }
 
     @GetMapping("/create")
@@ -89,8 +88,9 @@ public class BookController {
     public String updateBook(@ModelAttribute BookDto bookdto) {
         Book book = BookMapper.toBook(bookdto);
         bookService.setBookCover(book, bookdto.getCoverMultipart());
-        LOGGER.info("cover-{}, file-{}, {}",!bookdto.getCoverMultipart().isEmpty(),
-                !bookdto.getBookMultipart().isEmpty(), book);
+        bookService.setBookFiles(book, bookdto.getBookMultipart());
+        LOGGER.info("cover-{}, files-{}, {}", !bookdto.getCoverMultipart().isEmpty(),
+                bookdto.getBookMultipart().length, book);
         bookService.save(book);
         return "Book saved successfully";
     }
@@ -172,15 +172,17 @@ public class BookController {
 
     @GetMapping("/drive")
     public ResponseEntity<Object> downloadDrive(@RequestParam String isbn, @RequestParam String ext, Principal principal) {
+        LOGGER.info("download {}, isbn - {}",ext, isbn);
         Book book = bookService.findElectronicByUserIdAndIsbn(visitorService
                         .findByEmail(principal.getName()).orElse(new Visitor()).getId(), isbn).
                 orElseGet(Book::new);
-        byte[] file = bookService.getBookFileByUrl(book.getBookUrls().stream().filter(eb -> eb.getExtension().equals(ext)).findFirst().orElseThrow(
-                () -> new IllegalArgumentException("Wrong file extension")).getUrl());
+        String url = book.getBookUrls().stream().filter(eb -> eb.getExtension().equals(ext)).findFirst().orElseThrow(
+                () -> new IllegalArgumentException("Wrong file extension")).getUrl();
+        byte[] file = bookService.getBookFileByUrl(url);
         InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", String.format("attachment; filename=\"%s.%s\"",
-                book.getIsbn(), bookService.getExtBook(book.getIsbn()).getExtension()));
+                book.getIsbn(), ext));
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");

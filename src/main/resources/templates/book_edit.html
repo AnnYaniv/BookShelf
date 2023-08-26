@@ -108,7 +108,7 @@
             </div>
             <div class="col-md-4 mb-3">
                 <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="book" th:field="*{bookMultipart}">
+                    <input id="book" class="fileInput" type="file" name="bookMultipart" th:field="*{bookMultipart}" multiple />
                     <label class="custom-file-label" for="book">Choose a book*</label>
                 </div>
             </div>

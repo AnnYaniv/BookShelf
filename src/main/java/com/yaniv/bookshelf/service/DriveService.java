@@ -15,15 +15,15 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.twelvemonkeys.imageio.plugins.jpeg.JPEGImageWriter;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -33,9 +33,10 @@ public class DriveService {
     private final Drive service;
     private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
     @Value("${drive.cover}")
-    private String coverFolderId;
+    public String coverFolderId;
+
     @Value("${drive.book}")
-    private String bookFolderId;
+    public String bookFolderId;
 
     @SneakyThrows
     private DriveService() {
@@ -48,21 +49,24 @@ public class DriveService {
     }
 
     @SneakyThrows
-    public String upload(String filename, MultipartFile uploadFile, Folder folder) {
-        File fileMetadata = new File();
-        fileMetadata.setName((!StringUtils.isBlank(uploadFile.getContentType())) ? filename :
-                filename + "." + FilenameUtils.getExtension(uploadFile.getOriginalFilename()));
-        ByteArrayContent mediaContent = switch (folder) {
-            case COVER -> {
-                fileMetadata.setParents(Collections.singletonList(coverFolderId));
-                yield new ByteArrayContent(uploadFile.getContentType(), compressImage(uploadFile));
-            }
-            case BOOK -> {
-                fileMetadata.setParents(Collections.singletonList(bookFolderId))
-                        .setViewersCanCopyContent(false);
-                yield new ByteArrayContent(uploadFile.getContentType(), uploadFile.getBytes());
-            }
-        };
+    public String upload(String filename, String contentType, byte[] fileBytes) {
+        File fileMetadata = new File().setName(filename);
+        MimeType type;
+        try {
+            type = MimeTypeUtils.parseMimeType(contentType);
+        } catch (Exception ex) {
+            type = MimeTypeUtils.TEXT_XML;
+        }
+
+        ByteArrayContent mediaContent;
+        if("image".equals(type.getType())){
+            fileMetadata.setParents(Collections.singletonList(coverFolderId));
+            mediaContent = new ByteArrayContent(contentType, compressImage(fileBytes));
+        } else {
+            fileMetadata.setParents(Collections.singletonList(bookFolderId))
+                    .setViewersCanCopyContent(false);
+            mediaContent = new ByteArrayContent(contentType, fileBytes);
+        }
 
         File file = service.files().create(fileMetadata, mediaContent).setFields("id").execute();
         return file.getId();
@@ -73,6 +77,11 @@ public class DriveService {
     public String getExtension(String id) {
         File file = service.files().get(id).execute();
         return file.getMimeType();
+    }
+
+    @SneakyThrows
+    public File getFileData(String id){
+        return service.files().get(id).setFields("id, name, parents").execute();
     }
 
     public boolean delete(String id) {
@@ -93,18 +102,14 @@ public class DriveService {
     }
 
     @SneakyThrows
-    private byte[] compressImage(MultipartFile mpFile) {
+    private byte[] compressImage(byte[] imageBytes) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        BufferedImage image = ImageIO.read(mpFile.getInputStream());
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
         JPEGImageWriter writer = (JPEGImageWriter) ImageIO.getImageWritersByFormatName("JPEG").next();
         ImageWriteParam param = writer.getDefaultWriteParam();
         param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         writer.setOutput(ImageIO.createImageOutputStream(byteArrayOutputStream));
         writer.write(null, new IIOImage(image, null, null), param);
         return byteArrayOutputStream.toByteArray();
-    }
-
-    public enum Folder {
-        COVER, BOOK
     }
 }

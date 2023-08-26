@@ -37,7 +37,7 @@ public class BookMapper {
                 book.getIsbn(), book.getTitle(), book.getAnnotation(), book.getYear(),
                 book.getPublishingHouse(), book.getCount(), book.getPrice(), book.getVisited(),
                 null, null,
-                null, null,
+                null, book.getBookUrls(),
                 book.getAuthors().stream().map(Author::getId).toList(),
                 book.getGenre()
         );

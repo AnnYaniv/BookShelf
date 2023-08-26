@@ -93,8 +93,13 @@
                        th:attr="onclick=|addElectronicVersionToCart('${book.isbn}')|">to cart</a>
                     <a sec:authorize="hasAuthority('book:write')" th:href="@{/book/update(isbn=${book.isbn})}"
                        class="btn btn-lg btn-warning text-uppercase">update</a>
-                    <a th:if="${isDownload}" th:href="@{/book/drive(isbn=${book.isbn})}"
-                       class="btn btn-lg btn-success text-uppercase">download</a>
+                    <a th:if="${isDownload}"
+                       th:each="file, iterator : ${book.getExtBooks()}"
+                       th:text="${'download ' + file.getExtension()}"
+                       th:href="@{/book/drive(isbn=${book.isbn}, ext=${file.getExtension()})}"
+                       class="btn btn-lg btn-success text-uppercase"></a>
+
+
                     <a sec:authorize="hasAuthority('book:read')" th:href="@{/book/read(isbn=${book.isbn})}"
                        class="btn btn-lg btn-success text-uppercase">read</a>
                 </article>

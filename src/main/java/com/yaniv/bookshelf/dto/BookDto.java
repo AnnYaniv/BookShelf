@@ -1,5 +1,6 @@
 package com.yaniv.bookshelf.dto;
 
+import com.yaniv.bookshelf.model.ExtBook;
 import com.yaniv.bookshelf.model.enums.Genre;
 import lombok.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +19,9 @@ public class BookDto {
     double price;
     Integer visited;
     MultipartFile coverMultipart;
-    MultipartFile bookMultipart;
+    MultipartFile[] bookMultipart;
     String coverByte;
-    String bookByte;
+    Set<ExtBook> extBooks;
 
     List<String> authors;
     Set<Genre> genre;
@@ -39,7 +40,6 @@ public class BookDto {
                 ", coverMultipart=" + (coverMultipart != null) +
                 ", bookMultipart=" + (bookMultipart != null) +
                 ", coverByte='" + (coverByte != null) + '\'' +
-                ", bookByte='" + (bookByte != null) + '\'' +
                 '}';
     }
 }

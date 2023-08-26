@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +24,6 @@ import java.util.Optional;
 @NoArgsConstructor
 public class BookService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
     private static final int ITEMS_PER_PAGE = 9;
     private BookRepository bookRepository;
     private BookFilter bookFilter;
@@ -84,16 +81,19 @@ public class BookService {
             if (current.isPresent() && !StringUtils.isBlank(current.get().getCoverUrl())) {
                 driveService.delete(current.get().getCoverUrl());
             }
-            String id = driveService.upload(book.getIsbn(), cover, DriveService.Folder.COVER);
+            String filename = book.getIsbn() + "." + FilenameUtils.getExtension(cover.getOriginalFilename());
+            String id = driveService.upload(filename, cover.getContentType(), cover.getBytes());
             book.setCoverUrl(id);
         }
         return book;
     }
 
+    @SneakyThrows
     public boolean setBookFiles(Book book, MultipartFile[] bookFiles){
         for (MultipartFile file : bookFiles) {
-            ExtBook extBook = new ExtBook(FilenameUtils.getExtension(file.getName()),
-                    driveService.upload(book.getIsbn(), file, DriveService.Folder.BOOK));
+            String filename = book.getIsbn() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+            ExtBook extBook = new ExtBook(FilenameUtils.getExtension(file.getOriginalFilename()),
+                    driveService.upload(filename, file.getContentType(), file.getBytes()));
             if (!book.getBookUrls().add(extBook)) {
                 return false;
             }

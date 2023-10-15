@@ -2,13 +2,14 @@ package com.yaniv.bookshelf.service;
 
 import com.yaniv.bookshelf.dto.FilterDto;
 import com.yaniv.bookshelf.model.Book;
+import com.yaniv.bookshelf.model.ExtBook;
 import com.yaniv.bookshelf.repository.BookFilter;
 import com.yaniv.bookshelf.repository.BookRepository;
+import com.yaniv.bookshelf.repository.ExtBookRepository;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,17 +24,18 @@ import java.util.Optional;
 @NoArgsConstructor
 public class BookService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("service-log");
     private static final int ITEMS_PER_PAGE = 9;
     private BookRepository bookRepository;
     private BookFilter bookFilter;
     private DriveService driveService;
+    private ExtBookRepository extBookRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, BookFilter bookFilter, DriveService driveService) {
+    public BookService(BookRepository bookRepository, BookFilter bookFilter, DriveService driveService, ExtBookRepository extBookRepository) {
         this.driveService = driveService;
         this.bookRepository = bookRepository;
         this.bookFilter = bookFilter;
+        this.extBookRepository = extBookRepository;
     }
 
     public Optional<Book> findByUserIdAndIsbn(String userId, String isbn) {
@@ -61,34 +63,42 @@ public class BookService {
 
     public Book save(Book book) {
         Book beforeUpd = findById(book.getIsbn()).orElseGet(Book::new);
-        if (StringUtils.isBlank(book.getBookUrl())) {
-            book.setBookUrl(beforeUpd.getBookUrl());
+        if (book.getBookUrls().isEmpty()) {
+            book.setBookUrls(beforeUpd.getBookUrls());
         }
         if (StringUtils.isBlank(book.getCoverUrl())) {
             book.setCoverUrl(beforeUpd.getCoverUrl());
         }
+        extBookRepository.saveAll(book.getBookUrls());
         return bookRepository.save(book);
     }
 
 
     @SneakyThrows
-    public Book setBookFiles(Book book, MultipartFile cover, MultipartFile bookFile) {
+    public Book setBookCover(Book book, MultipartFile cover) {
         Optional<Book> current = findById(book.getIsbn());
         if (!cover.isEmpty()) {
             if (current.isPresent() && !StringUtils.isBlank(current.get().getCoverUrl())) {
                 driveService.delete(current.get().getCoverUrl());
             }
-            String id = driveService.upload(book.getIsbn(), cover, DriveService.Folder.COVER);
+            String filename = book.getIsbn() + "." + FilenameUtils.getExtension(cover.getOriginalFilename());
+            String id = driveService.upload(filename, cover.getContentType(), cover.getBytes());
             book.setCoverUrl(id);
         }
-        if (!bookFile.isEmpty()) {
-            if (current.isPresent() && !StringUtils.isBlank(current.get().getBookUrl())) {
-                driveService.delete(current.get().getBookUrl());
-            }
-            String id = driveService.upload(book.getIsbn(), bookFile, DriveService.Folder.BOOK);
-            book.setBookUrl(id);
-        }
         return book;
+    }
+
+    @SneakyThrows
+    public boolean setBookFiles(Book book, MultipartFile[] bookFiles){
+        for (MultipartFile file : bookFiles) {
+            String filename = book.getIsbn() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+            ExtBook extBook = new ExtBook(FilenameUtils.getExtension(file.getOriginalFilename()),
+                    driveService.upload(filename, file.getContentType(), file.getBytes()));
+            if (!book.getBookUrls().add(extBook)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getBookCover(String isbn) {
@@ -98,15 +108,22 @@ public class BookService {
     }
 
     public byte[] getBookFile(String isbn) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new IllegalArgumentException("Book with isbn=" + isbn + " dont exist"));
-        return driveService.download(book.getBookUrl()).toByteArray();
+        return driveService.download(getExtBook(isbn).getUrl()).toByteArray();
     }
 
-    public String getBookFileExtension(String isbn) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new IllegalArgumentException("Book with isbn=" + isbn + " dont exist"));
-        return driveService.getExtension(book.getBookUrl());
+    public byte[] getBookFileByUrl(String url) {
+        return driveService.download(url).toByteArray();
+    }
+
+    public ExtBook getExtBook(String isbn) {
+        ExtBook extBook = new ExtBook();
+        bookRepository.findByIsbn(isbn).flatMap(book -> book.getBookUrls().stream()
+                        .min((a, b) -> b.getExtension().compareToIgnoreCase(a.getExtension())))
+                .ifPresent(eb -> {
+                    extBook.setUrl(eb.getUrl());
+                    extBook.setExtension(eb.getExtension());
+                });
+        return extBook;
     }
 
     public Optional<Book> findById(String id) {
